@@ -1,0 +1,25 @@
+configfile: "config.yaml"
+
+from snk_cli import validate_config
+validate_config(config, "../snk.yaml")
+
+print(config)
+
+rule hello_world:
+    output: config['output']
+    params:
+        text=config['text'],
+        times=config['times']
+    threads: config['threads'] if config['threads'] else 1
+    shell: 
+        """
+        for i in {{1..{params.times}}}; do echo {params.text}; done
+        for i in {{1..{params.times}}}; do echo {params.text} >> {output}; done
+        """
+
+rule error:
+    shell: "exit 1"
+
+rule python:
+    conda: "envs/python.yml"
+    shell: "python -V"

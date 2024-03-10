@@ -1,0 +1,38 @@
+
+name: tests 
+on:
+  push:
+    branches:
+      - master 
+      - main
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: "conda-incubator/setup-miniconda@v2"
+        with:
+          python-version: 3.11
+          auto-activate-base: false
+          miniforge-variant: Mambaforge
+          channels: conda-forge,bioconda,defaults
+          channel-priority: strict
+          auto-update-conda: true
+      - uses: actions/cache@v2
+        with:
+          key: ${{ github.ref }}
+          path: .cache
+      - run: pip install hatch
+      - run: sudo apt-get update && sudo apt-get install -y llvm
+      - run: sudo apt-get -y install graphviz
+      - name: Run tests
+        shell: bash
+        run: hatch run cov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
+

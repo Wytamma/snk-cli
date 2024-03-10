@@ -1,0 +1,56 @@
+art: null
+cli:
+  hidden:
+    hidden: true
+  no_run:
+    default: false
+    help: A boolean to test
+    short: b
+    type: bool
+  null_annotation:
+    default: null
+  test:
+    another:
+      test:
+        default: test
+        help: A string to test
+        type: str
+    test_bool:
+      default: true
+      help: A boolean to test
+      type: bool
+    test_int:
+      default: 1
+      help: An integer to test
+      type: int
+    test_list:
+      default:
+      - 1
+      - 2
+      - 3
+      help: A list to test
+      type: list[int]
+    test_null:
+      type: str
+      default: null
+      help: A null to test
+  text:
+    default: Hi from snk.yaml!
+    help: A string to save to a file
+    type: str
+  times:
+    default: 1
+    help: Number of times to repeat the message
+    type: int
+  visible:
+    hidden: false
+conda: true
+font: cybermedium
+logo: MyWorkflow
+resources: []
+skip_missing: false
+symlink_resources: true
+tagline: '
+
+  A workflow to test the workflow logo and tagline'
+version: 0.13.0
