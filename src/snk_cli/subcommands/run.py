@@ -90,12 +90,6 @@ class RunApp(DynamicTyper):
             "-p",
             help="Name of profile to use for configuring Snakemake.",
         ),
-        force: bool = typer.Option(
-            False,
-            "--force",
-            "-f",
-            help="Force the execution of workflow regardless of already created output.",
-        ),
         dry: bool = typer.Option(
             False,
             "--dry",
@@ -157,7 +151,6 @@ class RunApp(DynamicTyper):
           configfile (Path, optional): Path to snakemake config file. Overrides existing workflow configuration. Defaults to None.
           resource (List[Path], optional): Additional resources to copy from workflow directory at run time. Defaults to [].
           profile (str, optional): Name of profile to use for configuring Snakemake. Defaults to None.
-          force (bool, optional): Force the execution of workflow regardless of already created output. Defaults to False.
           dry (bool, optional): Do not execute anything, and display what would be done. Defaults to False.
           lock (bool, optional): Lock the working directory. Defaults to False.
           dag (Path, optional): Save directed acyclic graph to file. Must end in .pdf, .png or .svg. Defaults to None.
@@ -245,9 +238,6 @@ class RunApp(DynamicTyper):
 
         if verbose:
             args.insert(0, "--verbose")
-
-        if force:
-            args.append("--forceall")
 
         if dry:
             args.append("--dryrun")
