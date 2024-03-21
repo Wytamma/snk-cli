@@ -3,17 +3,24 @@ from snakemake import load_configfile
 
 def get_version_from_config(config_path: Path, config_dict: dict = None) -> str:
     """
-    Get the version from config. If dict not provided, load from file.
-    If the version is a path to a __about__ file, load the version from the file.
-    Path must be relative to the config file.
+    Get the version from the config file or config dictionary.
+
     Args:
       config_path (Path): Path to the config file.
-      config_dict (dict): Config dict.
+      config_dict (dict, optional): Config dictionary. Defaults to None.
+
     Returns:
-      str: Version.
+      str: The version.
+
+    Raises:
+      FileNotFoundError: If the version file (__about__.py) is not found.
+      KeyError: If the __version__ key is not found in the version file.
+
     Examples:
-      >>> get_version_from_config_dict({"version": "0.1.0"})
+      >>> get_version_from_config(Path("config.yaml"))
       '0.1.0'
+      >>> get_version_from_config(Path("config.yaml"), {"version": "0.2.0"})
+      '0.2.0'
     """
     if not config_dict:
         config_dict = load_configfile(config_path)

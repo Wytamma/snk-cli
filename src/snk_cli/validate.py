@@ -5,16 +5,19 @@ from .options.utils import types
 import inspect
 
 class ValidationError(Exception):
-    """Base class for all validation exceptions"""
+    """
+    Base class for all validation exceptions.
+    """
 
 
 def validate_config(config: Dict[str, Any], snk_config_path: Path) -> None:
     """
     Validates the config against the snk config.
     Will convert values to the correct type if possible.
+
     Args:
-        config (dict): The config to validate.
-        snk_config_path (Path): The path to the snk config.
+      config (dict): The config to validate.
+      snk_config_path (Path): The path to the snk config.
     """
     snk_config_path = Path(snk_config_path)
     # if relative path, make absolute to 
@@ -32,10 +35,11 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
     """
     Validates the config against the snk config.
     Will convert values to the correct type if possible.
+
     Args:
-        config (dict): The config to validate.
-        validation (dict): The validation dict.
-        replace_none (bool): If True, replace 'None' with None.
+      config (dict): The config to validate.
+      validation (dict): The validation dict.
+      replace_none (bool): If True, replace 'None' with None.
     """
     for key, value in list(config.items()):
         if key not in validation:

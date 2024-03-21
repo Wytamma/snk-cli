@@ -10,8 +10,9 @@ class ConfigApp(DynamicTyper):
     def __init__(self, workflow: Workflow, options: List[Option]):
         """
         Initializes the ConfigApp class.
+
         Args:
-            workflow (Workflow): The workflow to configure.
+          workflow (Workflow): The workflow to configure.
         """
         self.options = options
         self.workflow = workflow
@@ -22,13 +23,17 @@ class ConfigApp(DynamicTyper):
     ):
         """
         Prints the configuration for the workflow.
+
         Args:
-            pretty (bool, optional): Whether to print the configuration in a pretty format. Defaults to False.
+          ctx (typer.Context): The Typer context.
+          pretty (bool, optional): Whether to print the configuration in a pretty format. Defaults to False.
+
         Returns:
-            None
+          None
+
         Examples:
-            >>> ConfigApp.show(pretty=True)
-            # Pretty printed configuration
+          >>> ConfigApp.show(pretty=True)
+          # Pretty printed configuration
         """
         import yaml
         from collections import defaultdict

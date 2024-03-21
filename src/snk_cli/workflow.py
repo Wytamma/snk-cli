@@ -8,6 +8,7 @@ import os
 class Workflow:
     """
     Represents a workflow.
+
     Attributes:
       path (Path): The path to the workflow.
       repo (Repo): The git repository of the workflow.
@@ -17,12 +18,15 @@ class Workflow:
     def __init__(self, path: Path) -> None:
         """
         Initializes a Workflow object.
+
         Args:
-            path (Path): The path to the workflow.
+          path (Path): The path to the workflow.
+
         Returns:
-            None
+          None
+
         Notes:
-            Initializes the `repo` and `name` attributes.
+          Initializes the `repo` and `name` attributes.
         """
         self.path = path
         self.editable = self.check_is_editable()
@@ -40,8 +44,9 @@ class Workflow:
     def tag(self):
         """
         Gets the tag of the workflow.
+
         Returns:
-            str: The tag of the workflow, or None if no tag is found.
+          str: The tag of the workflow, or None if no tag is found.
         """
         try:
             tag = self.repo.git.describe(["--tags", "--exact-match"])
@@ -53,8 +58,9 @@ class Workflow:
     def commit(self):
         """
         Gets the commit SHA of the workflow.
+
         Returns:
-            str: The commit SHA of the workflow.
+          str: The commit SHA of the workflow.
         """
         try:
             sha = self.repo.head.object.hexsha
@@ -67,8 +73,9 @@ class Workflow:
     def version(self):
         """
         Gets the version of the workflow.
+
         Returns:
-            str: The version of the workflow, or None if no version is found.
+          str: The version of the workflow, or None if no version is found.
         """
         if self.repo is None:
             return None
@@ -82,8 +89,9 @@ class Workflow:
     def executable(self):
         """
         Gets the executable of the workflow.
+
         Returns:
-            Path: The path to the workflow executable.
+          Path: The path to the workflow executable.
         """
         workflow_bin_dir = self.path.parent.parent / "bin"
         name = self.name
@@ -94,12 +102,10 @@ class Workflow:
     @property
     def conda_prefix_dir(self):
         """
-        Gets the conda prefix directory of the workflow. If in editable mode, the conda prefix directory is
-        located in the .snakemake directory. Otherwise, it is located in the .conda directory in the workflow
-        directory.
-        
+        Gets the conda prefix directory of the workflow. If in editable mode, the conda prefix directory is located in the .snakemake directory. Otherwise, it is located in the .conda directory in the workflow directory.
+
         Returns:
-            Path: The path to the conda prefix directory.
+          Path: The path to the conda prefix directory.
         """
         return Path(".snakemake") / "conda" if self.editable else self.path / ".conda"
 
@@ -107,8 +113,9 @@ class Workflow:
     def singularity_prefix_dir(self):
         """
         Gets the singularity prefix directory of the workflow.
+
         Returns:
-            Path: The path to the singularity prefix directory.
+          Path: The path to the singularity prefix directory.
         """
         if " " in str(self.path):
             # sigh, snakemake singularity does not support spaces in the path
@@ -137,7 +144,12 @@ class Workflow:
         return False
 
     def check_is_editable(self):
-        """Is the workflow editable?"""
+        """
+        Is the workflow editable?
+
+        Returns:
+          bool: True if the workflow is editable, False otherwise.
+        """
         if self.path.is_symlink():
             return True
         try:
@@ -146,7 +158,15 @@ class Workflow:
             return False
 
     def _find_folder(self, name) -> Optional[Path]:
-        """Search for folder"""
+        """
+        Search for folder.
+
+        Args:
+          name: The name of the folder to search for.
+
+        Returns:
+          Optional[Path]: The path to the folder, or None if the folder is not found.
+        """
         if (self.path / "workflow" / name).exists():
             return self.path / "workflow" / name
         if (self.path / name).exists():

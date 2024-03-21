@@ -37,13 +37,16 @@ def create_option_from_annotation(
 ) -> Option:
     """
     Create an Option object from a given annotation.
+
     Args:
-      annotation_key: The key in the annotations.
-      annotation_values: The dictionary of annotation values.
-      default_values: default value from config.
+      annotation_key (str): The key in the annotations.
+      annotation_values (dict): The dictionary of annotation values.
+      default_values (dict): Default value from config.
+      from_annotation (bool, optional): Whether the option is from an annotation. Defaults to False.
+
     Returns:
-      An Option object.
-    """    
+      Option: An Option object.
+    """
     config_default = default_values.get(annotation_key, None)
 
     default = annotation_values.get(f"{annotation_key}:default", config_default)
@@ -83,9 +86,11 @@ def build_dynamic_cli_options(
 ) -> List[dict]:
     """
     Builds a list of options from a snakemake config and a snk config.
+
     Args:
       snakemake_config (dict): A snakemake config.
       snk_config (SnkConfig): A snk config.
+
     Returns:
       List[dict]: A list of options.
     """

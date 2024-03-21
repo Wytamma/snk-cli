@@ -24,10 +24,13 @@ from snk_cli.workflow import Workflow
 class CLI(DynamicTyper):
     """
     Constructor for the dynamic Snk CLI class.
+
     Args:
       workflow_dir_path (Path): Path to the workflow directory.
+
     Side Effects:
       Initializes the CLI class.
+
     Examples:
       >>> CLI(Path('/path/to/workflow'))
     """
@@ -185,10 +188,14 @@ class CLI(DynamicTyper):
     ):
         """
         Create a logo for the CLI.
+
         Args:
-          font (str): The font to use for the logo.
+          tagline (str, optional): The tagline to include in the logo. Defaults to "A Snakemake workflow CLI generated with snk".
+          font (str, optional): The font to use for the logo. Defaults to "small".
+
         Returns:
           str: The logo.
+
         Examples:
           >>> CLI._create_logo()
         """
@@ -203,8 +210,13 @@ class CLI(DynamicTyper):
     def _find_snakefile(self):
         """
         Search possible snakefile locations.
+
         Returns:
           Path: The path to the snakefile.
+
+        Raises:
+          FileNotFoundError: If the snakefile is not found.
+
         Examples:
           >>> CLI._find_snakefile()
         """
@@ -216,8 +228,10 @@ class CLI(DynamicTyper):
     def info(self):
         """
         Display information about current workflow install.
+
         Returns:
           str: A JSON string containing information about the current workflow install.
+
         Examples:
           >>> CLI.info()
         """

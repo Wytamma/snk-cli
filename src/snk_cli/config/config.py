@@ -7,18 +7,57 @@ import yaml
 
 
 class SnkConfigError(Exception):
-    """Base class for all SNK config exceptions"""
+    """
+    Base class for all SNK config exceptions.
+    """
 
 class InvalidSnkConfigError(SnkConfigError, ValueError):
-    """Thrown if the given SNK config appears to have an invalid format."""
+    """
+    Thrown if the given SNK config appears to have an invalid format.
+    """
 
 class MissingSnkConfigError(SnkConfigError, FileNotFoundError):
-    """Thrown if the given SNK config file cannot be found."""
+    """
+    Thrown if the given SNK config file cannot be found.
+    """
 
 @dataclass
 class SnkConfig:
     """
     A dataclass for storing Snakemake workflow configuration.
+
+    Attributes:
+      art (str, optional): The art to display in the CLI. Defaults to None.
+      logo (str, optional): The logo to display in the CLI. Defaults to None.
+      tagline (str): The tagline to display in the CLI. Defaults to "A Snakemake workflow CLI generated with Snk".
+      font (str): The font size for the CLI. Defaults to "small".
+      version (Optional[str], optional): The version of the workflow. Defaults to None.
+      conda (bool): Whether to use conda for managing environments. Defaults to True.
+      resources (List[Path]): List of paths to additional resources. Defaults to an empty list.
+      skip_missing (bool): Whether to skip missing CLI options. Defaults to False.
+      additional_snakemake_args (List[str]): List of additional Snakemake command-line arguments. Defaults to an empty list.
+      cli (dict): Dictionary of CLI options and their values. Defaults to an empty dictionary.
+      symlink_resources (bool): Whether to symlink resources instead of copying them. Defaults to False.
+      _snk_config_path (Path): The path to the SNK config file. Defaults to None.
+
+    Methods:
+      from_path(snk_config_path: Path) -> SnkConfig:
+        Load and validate Snk config from file.
+
+      from_workflow_dir(workflow_dir_path: Path, create_if_not_exists: bool = False) -> SnkConfig:
+        Load and validate SNK config from workflow directory.
+
+      validate_resources(resources: List[Path]) -> None:
+        Validate resources.
+
+      add_resources(resources: List[Path], workflow_dir_path: Path = None) -> None:
+        Add resources to the SNK config.
+
+      to_yaml(path: Path) -> None:
+        Write SNK config to YAML file.
+
+      save() -> None:
+        Save SNK config.
     """
 
     art: str = None

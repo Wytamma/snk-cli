@@ -17,8 +17,10 @@ class DynamicTyper:
     def __call__(self):
         """
         Invoke the CLI.
+
         Side Effects:
           Invokes the CLI.
+
         Examples:
           >>> CLI(Path('/path/to/workflow'))()
         """
@@ -27,10 +29,13 @@ class DynamicTyper:
     def register_default_command(self, command: Callable, **command_kwargs) -> None:
         """
         Register a default command to the CLI.
+
         Args:
           command (Callable): The command to register.
+
         Side Effects:
           Registers the command to the CLI.
+
         Examples:
           >>> CLI.register_default_command(my_command)
         """
@@ -65,12 +70,17 @@ class DynamicTyper:
     ) -> None:
         """
         Register a command to the CLI.
+
         Args:
           command (Callable): The command to register.
+          dynamic_options (List[Option], optional): A list of dynamic options to add to the command.
+
         Side Effects:
           Registers the command to the CLI.
+
         Examples:
           >>> CLI.register_command(my_command)
+          >>> CLI.register_command(my_command, dynamic_options=[option1, option2])
         """
         if dynamic_options is not None:
             command = self.add_dynamic_options(command, dynamic_options)
@@ -82,10 +92,13 @@ class DynamicTyper:
     def register_callback(self, command: Callable, **command_kwargs) -> None:
         """
         Register a callback to the CLI.
+
         Args:
           command (Callable): The callback to register.
+
         Side Effects:
           Registers the callback to the CLI.
+
         Examples:
           >>> CLI.register_callback(my_callback)
         """
@@ -93,23 +106,29 @@ class DynamicTyper:
 
     def register_group(self, group: "DynamicTyper", **command_kwargs) -> None:
         """
-        Register a subcommand group group to the CLI.
+        Register a subcommand group to the CLI.
+
         Args:
           group (DynamicTyper): The subcommand group to register.
+
         Side Effects:
           Registers the subcommand group to the CLI.
+
         Examples:
-          >>> CLI.register_app(my_group)
+          >>> CLI.register_group(my_group)
         """
         self.app.add_typer(group.app, **command_kwargs)
 
     def _create_cli_parameter(self, option: Option):
         """
         Creates a parameter for a CLI option.
+
         Args:
           option (Option): An Option object containing the option's name, type, required status, default value, and help message.
+
         Returns:
           Parameter: A parameter object for the CLI option.
+
         Examples:
           >>> option = Option(name='foo', type='int', required=True, default=0, help='A number')
           >>> create_cli_parameter(option)
@@ -131,8 +150,10 @@ class DynamicTyper:
     def check_if_option_passed_via_command_line(self, option: Option):
         """
         Check if an option is passed via the command line.
+
         Args:
           option (Option): An Option object containing the option's name, type, required status, default value, and help message.
+
         Returns:
           bool: Whether the option is passed via the command line.
         """
@@ -148,15 +169,17 @@ class DynamicTyper:
     def add_dynamic_options(self, func: Callable, options: List[Option]):
         """
         Function to add dynamic options to a command.
+
         Args:
-          command (Callable): The command to which the dynamic options should be added.
-          options (List[dict]): A list of dictionaries containing the option's name, type, required status, default value, and help message.
+          func (Callable): The command to which the dynamic options should be added.
+          options (List[Option]): A list of Option objects containing the options to add.
+
         Returns:
           Callable: A function with the dynamic options added.
+
         Examples:
-          >>> my_func = add_dynamic_options_to_function(my_func, [{'name': 'foo', 'type': 'int', 'required': True, 'default': 0, 'help': 'A number'}])
+          >>> my_func = add_dynamic_options_to_function(my_func, [option1, option2])
           >>> my_func
-          <function my_func at 0x7f8f9f9f9f90>
         """
         func_sig = signature(func)
         params = list(func_sig.parameters.values())
@@ -168,13 +191,16 @@ class DynamicTyper:
         def func_wrapper(*args, **kwargs):
             """
             Wraps a function with dynamic options.
+
             Args:
-                *args: Variable length argument list.
-                **kwargs: Arbitrary keyword arguments.
+              *args: Variable length argument list.
+              **kwargs: Arbitrary keyword arguments.
+
             Returns:
-                Callable: A wrapped function with the dynamic options added.
+              Callable: A wrapped function with the dynamic options added.
+
             Notes:
-                This function is used in the `add_dynamic_options_to_function` function.
+              This function is used in the `add_dynamic_options_to_function` function.
             """
             flat_config = None
 
@@ -216,6 +242,7 @@ class DynamicTyper:
     def error(self, msg, exit=True):
         """
         Logs an error message (red) and exits (optional).
+
         Args:
           msg (str): The error message to log.
           exit (bool): Whether to exit after logging the error message.
@@ -227,6 +254,7 @@ class DynamicTyper:
     def success(self, msg):
         """
         Logs a success message (green).
+
         Args:
           msg (str): The success message to log.
         """
@@ -235,14 +263,18 @@ class DynamicTyper:
     def log(self, msg, color="yellow", stderr=True):
         """
         Logs a message (yellow).
+
         Args:
           msg (str): The message to log.
+          color (str, optional): The color of the log message. Defaults to "yellow".
+          stderr (bool, optional): Whether to log the message to stderr. Defaults to True.
         """
         typer.secho(msg, fg=color, err=stderr)
 
     def echo(self, msg):
         """
         Prints a message.
+
         Args:
           msg (str): The message to print.
         """

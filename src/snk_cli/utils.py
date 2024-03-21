@@ -15,12 +15,15 @@ from snk_cli.options import Option
 def check_command_available(command: str):
     """
     Check if a command is available.
+
     Args:
       command (str): The command to check.
+
     Returns:
       bool: True if the command is available, False otherwise.
+
     Examples:
-      >>> CLI.check_command_available('ls')
+      >>> check_command_available('ls')
     """
     from shutil import which
 
@@ -30,12 +33,15 @@ def check_command_available(command: str):
 def flatten(d, parent_key="", sep=":"):
     """
     Flattens a nested dictionary.
+
     Args:
       d (dict): The dictionary to flatten.
       parent_key (str, optional): The parent key of the dictionary. Defaults to ''.
       sep (str, optional): The separator to use between keys. Defaults to ':'.
+
     Returns:
       dict: A flattened dictionary.
+
     Examples:
       >>> d = {'a': {'b': 1, 'c': 2}, 'd': 3}
       >>> flatten(d)
@@ -53,7 +59,15 @@ def flatten(d, parent_key="", sep=":"):
 
 def convert_key_to_snakemake_format(key, value, sep=":"):
     """
-    Convert key to a format that can be passed over the cli to snakemake
+    Convert key to a format that can be passed over the cli to snakemake.
+
+    Args:
+      key (str): The key to convert.
+      value (any): The value associated with the key.
+      sep (str, optional): The separator to use between keys. Defaults to ':'.
+
+    Returns:
+      dict: The converted key-value pair in snakemake format.
     """
     result_dict = {}
     parts = key.split(sep)
@@ -70,10 +84,13 @@ def convert_key_to_snakemake_format(key, value, sep=":"):
 def serialise(d):
     """
     Serialises a data structure into a string.
+
     Args:
       d (any): The data structure to serialise.
+
     Returns:
       any: The serialised data structure.
+
     Examples:
       >>> serialise({'a': 1, 'b': 2})
       {'a': '1', 'b': '2'}
@@ -95,11 +112,14 @@ def serialise(d):
 def parse_config_args(args: List[str], options: List[Option]):
     """
     Parses a list of arguments and a list of options.
+
     Args:
       args (List[str]): A list of arguments.
       options (List[Option]): A list of options.
+
     Returns:
-      (List[str], List[dict]): A tuple of parsed arguments and config.
+      Tuple[List[str], List[dict]]: A tuple of parsed arguments and config.
+
     Examples:
       >>> parse_config_args(['-name', 'John', '-age', '20'], [{'name': 'name', 'default': '', 'help': '', 'type': 'str', 'required': True}, {'name': 'age', 'default': '', 'help': '', 'type': 'int', 'required': True}])
       (['John', '20'], [{'name': 'name', 'John'}, {'age': 20}])

@@ -53,12 +53,15 @@ class RunApp(DynamicTyper):
     def _print_snakemake_help(value: bool):
         """
         Print the snakemake help and exit.
+
         Args:
           value (bool): If True, print the snakemake help and exit.
+
         Side Effects:
           Prints the snakemake help and exits.
+
         Examples:
-          >>> CLI._print_snakemake_help(True)
+          >>> RunApp._print_snakemake_help(True)
         """
         if value:
             import snakemake
@@ -148,18 +151,28 @@ class RunApp(DynamicTyper):
     ):
         """
         Run the workflow.
+
         Args:
-          configfile (Path): Path to snakemake config file. Overrides existing config and defaults.
-          resource (List[Path]): Additional resources to copy to workdir at run time.
-          keep_resources (bool): Keep resources.
-          cleanup_snakemake (bool): Keep .snakemake folder.
-          cores (int): Set the number of cores to use. If None will use all cores.
-          verbose (bool): Run workflow in verbose mode.
-          help_snakemake (bool): Print the snakemake help and exit.
+          ctx (typer.Context): The typer context.
+          configfile (Path, optional): Path to snakemake config file. Overrides existing workflow configuration. Defaults to None.
+          resource (List[Path], optional): Additional resources to copy from workflow directory at run time. Defaults to [].
+          profile (str, optional): Name of profile to use for configuring Snakemake. Defaults to None.
+          force (bool, optional): Force the execution of workflow regardless of already created output. Defaults to False.
+          dry (bool, optional): Do not execute anything, and display what would be done. Defaults to False.
+          lock (bool, optional): Lock the working directory. Defaults to False.
+          dag (Path, optional): Save directed acyclic graph to file. Must end in .pdf, .png or .svg. Defaults to None.
+          cores (int, optional): Set the number of cores to use. If None will use all cores. Defaults to None.
+          no_conda (bool, optional): Do not use conda environments. Defaults to False.
+          keep_resources (bool, optional): Keep resources after pipeline completes. Defaults to False.
+          keep_snakemake (bool, optional): Keep .snakemake folder after pipeline completes. Defaults to False.
+          verbose (bool, optional): Run workflow in verbose mode. Defaults to False.
+          help_snakemake (bool, optional): Print the snakemake help and exit. Defaults to False.
+
         Side Effects:
           Runs the workflow.
+
         Examples:
-          >>> CLI.run(target='my_target', configfile=Path('/path/to/config.yaml'), resource=[Path('/path/to/resource')], verbose=True)
+          >>> RunApp.run(target='my_target', configfile=Path('/path/to/config.yaml'), resource=[Path('/path/to/resource')], verbose=True)
         """
         import snakemake
         import shutil
@@ -331,15 +344,20 @@ class RunApp(DynamicTyper):
     ):
         """
         Copy resources to the current working directory.
+
         Args:
           resources (List[Path]): A list of paths to the resources to copy.
           cleanup (bool): If True, the resources will be removed after the function exits.
+          symlink_resources (bool, optional): If True, symlink the resources instead of copying them. Defaults to False.
+
         Side Effects:
           Copies the resources to the current working directory.
+
         Returns:
           Generator: A generator object.
+
         Examples:
-          >>> with CLI.copy_resources(resources, cleanup=True):
+          >>> with RunApp._copy_resources(resources, cleanup=True):
           ...     # do something
         """
         import os
@@ -409,7 +427,15 @@ class RunApp(DynamicTyper):
 
 
 def parse_config_monkeypatch(args):
-    """Monkeypatch the parse_config function from snakemake."""
+    """
+    Monkeypatch the parse_config function from snakemake.
+
+    Args:
+      args: The arguments to parse.
+
+    Returns:
+      dict: The parsed config.
+    """
     import yaml
     import snakemake
     import re
@@ -418,13 +444,13 @@ def parse_config_monkeypatch(args):
         @classmethod
         def remove_implicit_resolver(cls, tag_to_remove):
             """
-            Remove implicit resolvers for a particular tag
+            Remove implicit resolvers for a particular tag.
 
-            Takes care not to modify resolvers in super classes.
+            Args:
+              tag_to_remove: The tag to remove.
 
-            We want to load datetimes as strings, not dates, because we
-            go on to serialise as json which doesn't have the advanced types
-            of yaml, and leads to incompatibilities down the track.
+            Side Effects:
+              Modifies the implicit resolvers for the specified tag.
             """
             if "yaml_implicit_resolvers" not in cls.__dict__:
                 cls.yaml_implicit_resolvers = cls.yaml_implicit_resolvers.copy()
@@ -437,7 +463,15 @@ def parse_config_monkeypatch(args):
     NoDatesSafeLoader.remove_implicit_resolver("tag:yaml.org,2002:timestamp")
 
     def _yaml_safe_load(s):
-        """Load yaml string safely."""
+        """
+        Load yaml string safely.
+
+        Args:
+        s (str): The yaml string to load.
+
+        Returns:
+        The loaded yaml object.
+        """
         s = s.replace(": None", ": null")
         return yaml.load(s, Loader=NoDatesSafeLoader)
 

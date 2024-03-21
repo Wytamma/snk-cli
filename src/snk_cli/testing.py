@@ -6,7 +6,15 @@ import sys
 
 @dataclass
 class SnkCliRunner:
-    """Dynamically create a CLI Runner for testing"""
+    """
+    Dynamically creates a CLI Runner for testing.
+
+    Args:
+      cli (CLI): The CLI object to be tested.
+
+    Attributes:
+      runner (CliRunner): The CliRunner object used for testing.
+    """
 
     cli: CLI
     runner = CliRunner(mix_stderr=False)
