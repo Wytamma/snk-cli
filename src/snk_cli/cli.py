@@ -58,10 +58,10 @@ class CLI(DynamicTyper):
             )
         else:
             self.snk_config = snk_config
-        if self.snk_config.version:
-            self.version = self.snk_config.version
-        else: 
+        if self.workflow.version:
             self.version = self.workflow.version
+        else: 
+            self.version = self.snk_config.version
         self.options = build_dynamic_cli_options(self.snakemake_config, self.snk_config)
         self.snakefile = self._find_snakefile()
         self.conda_prefix_dir = self.workflow.conda_prefix_dir
