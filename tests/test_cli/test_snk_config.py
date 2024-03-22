@@ -1,17 +1,29 @@
 from snk_cli.config import SnkConfig
-from ..utils import gen_dynamic_runner_fixture, SnkCliRunner
+from ..utils import dynamic_runner
 
 
-@gen_dynamic_runner_fixture({"missing": True}, SnkConfig(skip_missing=True, cli={"visible": {"help": "visible"}}))
-def test_skip_missing(dynamic_runner: SnkCliRunner):
-    res = dynamic_runner(["run", "--help"])
+def test_skip_missing(tmp_path):
+    runner = dynamic_runner({"missing": True}, SnkConfig(skip_missing=True, cli={"visible": {"help": "visible"}}), tmp_path=tmp_path)
+    res = runner.invoke(["run", "--help"])
     assert res.exit_code == 0, res.stderr
     assert "missing" not in res.stdout, res.stderr
     assert "visible" in res.stdout, res.stderr
 
 
-@gen_dynamic_runner_fixture({"missing": True}, SnkConfig(additional_snakemake_args=["--help"]))
-def test_additional_snakemake_args(dynamic_runner: SnkCliRunner):
-    res = dynamic_runner(["run", "-v"])
+def test_additional_snakemake_args(tmp_path):
+    runner = dynamic_runner({"missing": True}, SnkConfig(additional_snakemake_args=["--help"]), tmp_path=tmp_path)
+    res = runner.invoke(["run", "-v"])
     assert res.exit_code == 0, res.stderr
     assert "Snakemake is a Python based language and execution environment" in res.stdout, res.stderr
+
+
+def test_snk_config_commands_run_only(tmp_path):
+    runner = dynamic_runner({}, SnkConfig(commands=["run"]), tmp_path=tmp_path)
+    res = runner.invoke(["--help"])
+    assert res.exit_code == 0, res.stderr
+    assert "run" in res.stdout, res.stderr
+    assert "config" not in res.stdout, res.stderr
+    assert "env" not in res.stdout, res.stderr
+    assert "script" not in res.stdout, res.stderr
+    assert "profile" not in res.stdout, res.stderr
+

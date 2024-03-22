@@ -129,3 +129,11 @@ def test_log(dynamic_typer, cli_runner, capsys):
     dynamic_typer.log("Log message", stderr=False)
     captured = capsys.readouterr()
     assert "Log message" in captured.out
+
+
+def test_app_instance_not_shared(dynamic_app):
+    class App(DynamicTyper):
+        pass
+    app1 = App().app
+    app2 = App().app
+    assert app1 is not app2
