@@ -1,11 +1,15 @@
 import pytest
 from typer.testing import CliRunner
-from snk_cli.dynamic_typer import DynamicTyper, Option
+from snk_cli.dynamic_typer import DynamicTyper
 from snk_cli.options import Option
-from typing import Callable
 from inspect import signature, Parameter
 import typer
 
+class SubApp(DynamicTyper):
+    def __init__(self):
+        self.register_command(self.hello)
+    def hello(self):
+        self.echo("Hello World")
 
 @pytest.fixture
 def dynamic_typer():
@@ -61,12 +65,6 @@ def test_register_callback(dynamic_app: DynamicTyper, cli_runner):
 
 
 def test_register_group(dynamic_app: DynamicTyper, cli_runner):
-    
-    class SubApp(DynamicTyper):
-        def __init__(self):
-            self.register_command(self.hello)
-        def hello(self):
-            self.echo("Hello World")
 
     dynamic_app.register_group(SubApp(), name="subapp", help="A subapp")
 
@@ -131,9 +129,20 @@ def test_log(dynamic_typer, cli_runner, capsys):
     assert "Log message" in captured.out
 
 
-def test_app_instance_not_shared(dynamic_app):
+def test_app_instance_not_shared():
     class App(DynamicTyper):
         pass
     app1 = App().app
     app2 = App().app
     assert app1 is not app2
+
+def test_calling_cli_produces_help(dynamic_app: DynamicTyper, capsys):
+    import sys
+    sys.argv = ['cli', '--help']
+    try:
+        dynamic_app.register_group(SubApp(), name="subapp", help="A subapp")
+        dynamic_app()
+    except SystemExit:
+        pass
+    captured = capsys.readouterr()
+    assert "Usage" in captured.out
