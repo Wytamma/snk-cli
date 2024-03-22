@@ -34,10 +34,11 @@ class SnkConfig:
       version (Optional[str], optional): The version of the workflow. Defaults to None.
       conda (bool): Whether to use conda for managing environments. Defaults to True.
       resources (List[Path]): List of paths to additional resources. Defaults to an empty list.
+      symlink_resources (bool): Whether to symlink resources instead of copying them. Defaults to False.
       skip_missing (bool): Whether to skip missing CLI options. Defaults to False.
       additional_snakemake_args (List[str]): List of additional Snakemake command-line arguments. Defaults to an empty list.
+      commands (List[str]): List of subcommands to include in the CLI. Defaults to ["run", "script", "env", "profile", "info", "config"].
       cli (dict): Dictionary of CLI options and their values. Defaults to an empty dictionary.
-      symlink_resources (bool): Whether to symlink resources instead of copying them. Defaults to False.
       _snk_config_path (Path): The path to the SNK config file. Defaults to None.
 
     Methods:
@@ -67,10 +68,11 @@ class SnkConfig:
     version: Optional[str] = None
     conda: bool = True
     resources: List[Path] = field(default_factory=list)
+    symlink_resources: bool = False
     skip_missing: bool = False # skip any missing cli options (i.e. those not in the snk file)
     additional_snakemake_args: List[str] = field(default_factory=list)
+    commands: List[str] = field(default_factory=lambda: ["run", "script", "env", "profile", "info", "config"])
     cli: dict = field(default_factory=dict)
-    symlink_resources: bool = False
     _snk_config_path: Path = None
 
     @classmethod
@@ -111,6 +113,7 @@ class SnkConfig:
         ]
         snk_config.validate_resources(snk_config.resources)
         snk_config._snk_config_path = snk_config_path
+        print(f"snk_config: {snk_config}")
         return snk_config
   
     @classmethod

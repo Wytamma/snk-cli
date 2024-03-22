@@ -91,31 +91,35 @@ class CLI(DynamicTyper):
             invoke_without_command=True,
             context_settings={"help_option_names": ["-h", "--help"]},
         )
-        self.register_command(self.info, help="Show information about the workflow.")
 
-        run_app = RunApp(
-            conda_prefix_dir=self.conda_prefix_dir,
-            snk_config=self.snk_config,
-            singularity_prefix_dir=self.singularity_prefix_dir,
-            snakefile=self.snakefile,
-            workflow=self.workflow,
-            verbose=self.verbose,
-            logo=self.logo,
-            dynamic_run_options=self.options,
-        )
         # Subcommands
-        self.register_command(
-            run_app,
-            name="run",
-        )
-        self.register_command(
-            ConfigApp(
+        if "info" in self.snk_config.commands:
+            self.register_command(self.info, help="Show information about the workflow.")
+
+        if "run" in self.snk_config.commands:
+            run_app = RunApp(
+                conda_prefix_dir=self.conda_prefix_dir,
+                snk_config=self.snk_config,
+                singularity_prefix_dir=self.singularity_prefix_dir,
+                snakefile=self.snakefile,
                 workflow=self.workflow,
-                options=self.options,
-            ),
-            name="config",
-        )
-        if self.workflow.environments:
+                verbose=self.verbose,
+                logo=self.logo,
+                dynamic_run_options=self.options,
+            )
+            self.register_command(
+                run_app,
+                name="run",
+            )
+        if "config" in self.snk_config.commands:
+            self.register_command(
+                ConfigApp(
+                    workflow=self.workflow,
+                    options=self.options,
+                ),
+                name="config",
+            )
+        if self.workflow.environments and "env" in self.snk_config.commands:
             self.register_group(
                 EnvApp(
                     workflow=self.workflow,
@@ -126,7 +130,7 @@ class CLI(DynamicTyper):
                 name="env",
                 help="Access the workflow conda environments.",
             )
-        if self.workflow.scripts:
+        if self.workflow.scripts and "script" in self.snk_config.commands:
             self.register_group(
                 ScriptApp(
                     workflow=self.workflow,
@@ -137,7 +141,7 @@ class CLI(DynamicTyper):
                 name="script",
                 help="Access the workflow scripts.",
             )
-        if self.workflow.profiles:
+        if self.workflow.profiles and "profile" in self.snk_config.commands:
             self.register_group(
                 ProfileApp(
                     workflow=self.workflow,

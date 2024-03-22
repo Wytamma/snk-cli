@@ -10,9 +10,8 @@ import sys
 class DynamicTyper:
     app: typer.Typer
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls.app = typer.Typer()
+    def __init__(self):
+        self.app = typer.Typer()
 
     def __call__(self):
         """
@@ -24,7 +23,17 @@ class DynamicTyper:
         Examples:
           >>> CLI(Path('/path/to/workflow'))()
         """
-        self.app()
+        self._set_app()
+
+    def _set_app(self):
+        """
+        Set the app attribute.
+
+        Side Effects:
+          Sets the app attribute to a Typer object.
+        """
+        if not hasattr(self, "app"):
+          self.app = typer.Typer()
 
     def register_default_command(self, command: Callable, **command_kwargs) -> None:
         """
@@ -82,6 +91,7 @@ class DynamicTyper:
           >>> CLI.register_command(my_command)
           >>> CLI.register_command(my_command, dynamic_options=[option1, option2])
         """
+        self._set_app()
         if dynamic_options is not None:
             command = self.add_dynamic_options(command, dynamic_options)
         if isinstance(command, DynamicTyper):
@@ -102,6 +112,7 @@ class DynamicTyper:
         Examples:
           >>> CLI.register_callback(my_callback)
         """
+        self._set_app()
         self.app.callback(**command_kwargs)(command)
 
     def register_group(self, group: "DynamicTyper", **command_kwargs) -> None:
@@ -117,6 +128,7 @@ class DynamicTyper:
         Examples:
           >>> CLI.register_group(my_group)
         """
+        self._set_app()
         self.app.add_typer(group.app, **command_kwargs)
 
     def _create_cli_parameter(self, option: Option):
