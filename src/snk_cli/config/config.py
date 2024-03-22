@@ -113,7 +113,6 @@ class SnkConfig:
         ]
         snk_config.validate_resources(snk_config.resources)
         snk_config._snk_config_path = snk_config_path
-        print(f"snk_config: {snk_config}")
         return snk_config
   
     @classmethod

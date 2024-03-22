@@ -68,7 +68,6 @@ def test_run_cli_help(local_runner: SnkCliRunner):
 @pytest.mark.parametrize("filetype", ["pdf", "svg", "png"])
 def test_dag(local_runner: SnkCliRunner, tmp_path, filetype):
     args = ["run", "--dag", f"{tmp_path}/dag.{filetype}"]
-    print(args)
     res = local_runner(args)
     assert res.exit_code == 0, res.stderr
     assert Path(f"{tmp_path}/dag.{filetype}").exists()
