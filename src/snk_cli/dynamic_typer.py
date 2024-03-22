@@ -23,7 +23,7 @@ class DynamicTyper:
         Examples:
           >>> CLI(Path('/path/to/workflow'))()
         """
-        self._set_app()
+        self.app()
 
     def _set_app(self):
         """
