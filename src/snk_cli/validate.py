@@ -52,7 +52,7 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
         val_info = validation[key]
         if isinstance(val_info, dict) and 'type' in val_info:
             # Direct type validation
-            val_type = types.get(val_info["type"], None)
+            val_type = types.get(val_info["type"].lower(), None)
             if val_type is None:
                 raise ValueError(f"Unknown type '{val_info['type']}'")
             try:
