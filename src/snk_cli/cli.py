@@ -244,6 +244,9 @@ class CLI(DynamicTyper):
         info_dict = {}
         info_dict["name"] = self.workflow.path.name
         info_dict["version"] = self.version
+        info_dict["snakefile"] = str(self.snakefile)
+        info_dict["conda_prefix_dir"] = str(self.conda_prefix_dir)
+        info_dict["singularity_prefix_dir"] = str(self.singularity_prefix_dir)
         info_dict["workflow_dir_path"] = str(self.workflow.path)
         typer.echo(json.dumps(info_dict, indent=2))
 

@@ -13,6 +13,7 @@ import pytest
     (["env", "run", "python", "which python"], ["bin/python"], []),
     (["env", "activate", "python"], [], ["Activating python environment...", "Exiting python environment..."]),
     (["env", "remove", "-f"], ["Deleted"], []),
+    (["info"], ["name", "version", "snakefile", "conda_prefix_dir", "singularity_prefix_dir", "workflow_dir_path"], []),
 ])
 def test_snk_cli_command(capfd, local_runner, cmd, expected_in_stdout, expected_in_stderr):
     res = local_runner(cmd)
