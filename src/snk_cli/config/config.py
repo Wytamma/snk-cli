@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List, Optional
 import snakemake
 from dataclasses import dataclass, field
-from .utils import get_version_from_config
+from .utils import get_version_from_config, load_configfile
 import yaml
 
 
@@ -97,7 +97,7 @@ class SnkConfig:
         if snk_config_path.stat().st_size == 0:
             raise InvalidSnkConfigError(f"SNK config file is empty: {snk_config_path}") from ValueError
 
-        snk_config_dict = snakemake.load_configfile(snk_config_path)
+        snk_config_dict = load_configfile(snk_config_path)
         snk_config_dict["version"] = get_version_from_config(snk_config_path, snk_config_dict)
         if "annotations" in snk_config_dict:
             # TODO: remove annotations in the future
@@ -257,4 +257,4 @@ def load_workflow_snakemake_config(workflow_dir_path: Path):
     workflow_config_path = get_config_from_workflow_dir(workflow_dir_path)
     if not workflow_config_path or not workflow_config_path.exists():
         return {}
-    return snakemake.load_configfile(workflow_config_path)
+    return load_configfile(workflow_config_path)

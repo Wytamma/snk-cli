@@ -1,12 +1,11 @@
 from pathlib import Path
 from snk_cli.utils import flatten, convert_key_to_snakemake_format
-import snakemake
 import pytest
 from ..utils import SnkCliRunner
-
+from snk_cli.config.utils import load_configfile
 
 def test_flatten(example_config: Path):
-    config = snakemake.load_configfile(example_config)
+    config = load_configfile(example_config)
     flat_config = flatten(config)
     assert flat_config["diffexp:contrasts:A-vs-B"] == ["A", "B"]
 
