@@ -5,6 +5,7 @@ from contextlib import contextmanager
 
 from snk_cli.dynamic_typer import DynamicTyper
 from snk_cli.options.option import Option
+from snk_cli.conda import is_snakemake_version_8_or_above
 from ..workflow import Workflow
 from snk_cli.utils import (
     parse_config_args,
@@ -167,7 +168,6 @@ class RunApp(DynamicTyper):
         Examples:
           >>> RunApp.run(target='my_target', configfile=Path('/path/to/config.yaml'), resource=[Path('/path/to/resource')], verbose=True)
         """
-        import snakemake
         import shutil
         import sys
 
@@ -274,8 +274,7 @@ class RunApp(DynamicTyper):
             if dag:
                 return self._save_dag(snakemake_args=args, filename=dag)
             try:
-                snakemake.parse_config = parse_config_monkeypatch
-                snakemake.main(args)
+                execute_snakemake(args)
             except SystemExit as e:
                 status = int(str(e))
                 if status:
@@ -286,7 +285,6 @@ class RunApp(DynamicTyper):
 
     def _save_dag(self, snakemake_args: List[str], filename: Path):
         from contextlib import redirect_stdout
-        import snakemake
         import subprocess
         import io
 
@@ -300,8 +298,7 @@ class RunApp(DynamicTyper):
         with redirect_stdout(snakemake_output):
             # Capture the output of snakemake.main(args) using a try-except block
             try:
-                snakemake.parse_config = parse_config_monkeypatch
-                snakemake.main(snakemake_args)
+                execute_snakemake(snakemake_args)
             except SystemExit:  # Catch SystemExit exception to prevent termination
                 pass
         try:
@@ -415,6 +412,24 @@ class RunApp(DynamicTyper):
                         )
                     remove_resource(copied_resource)
 
+def execute_snakemake(args):
+    """
+    Execute snakemake with the given arguments.
+
+    Args:
+      args: The arguments to pass to snakemake.
+
+    Side Effects:
+      Executes snakemake with the given arguments.
+    """
+    import snakemake
+    if is_snakemake_version_8_or_above:
+        from snakemake import cli
+        cli.parse_config = parse_config_monkeypatch
+        cli.main(args)
+    else:
+        snakemake.parse_config = parse_config_monkeypatch
+        snakemake.main(args)
 
 def parse_config_monkeypatch(args):
     """
@@ -427,8 +442,13 @@ def parse_config_monkeypatch(args):
       dict: The parsed config.
     """
     import yaml
-    import snakemake
     import re
+    if is_snakemake_version_8_or_above:
+        from snakemake.cli import parse_key_value_arg, update_config, _bool_parser
+        entries = args
+    else:
+        from snakemake import parse_key_value_arg, update_config, _bool_parser
+        entries = args.config
 
     class NoDatesSafeLoader(yaml.SafeLoader):
         @classmethod
@@ -465,12 +485,12 @@ def parse_config_monkeypatch(args):
         s = s.replace(": None", ": null")
         return yaml.load(s, Loader=NoDatesSafeLoader)
 
-    parsers = [int, float, snakemake._bool_parser, _yaml_safe_load, str]
+    parsers = [int, float, _bool_parser, _yaml_safe_load, str]
     config = dict()
-    if args.config is not None:
+    if entries is not None:
         valid = re.compile(r"[a-zA-Z_]\w*$")
-        for entry in args.config:
-            key, val = snakemake.parse_key_value_arg(
+        for entry in entries:
+            key, val = parse_key_value_arg(
                 entry,
                 errmsg="Invalid config definition: Config entries have to be defined as name=value pairs.",
             )
@@ -480,7 +500,7 @@ def parse_config_monkeypatch(args):
                 )
             v = None
             if val == "" or val == "None":
-                snakemake.update_config(config, {key: v})
+                update_config(config, {key: v})
                 continue
             for parser in parsers:
                 try:
@@ -491,5 +511,5 @@ def parse_config_monkeypatch(args):
                 except:
                     pass
             assert v is not None
-            snakemake.update_config(config, {key: v})
+            update_config(config, {key: v})
     return config
