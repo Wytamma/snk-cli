@@ -25,7 +25,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "snakemake>=7,<8",
+  "snakemake>=7",
   "typer[all]~=0.9.0",
   "GitPython~=3.1",
   "pulp<2.8",  # Pin pulp <2.8 for snakemake: https://github.com/snakemake/snakemake/issues/2607
@@ -43,15 +43,21 @@ Source = "https://github.com/unknown/snk-cli"
 path = "src/snk_cli/__about__.py"
 
 
-[[tool.hatch.envs.test.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+[[tool.hatch.envs.v7.matrix]]
+python = ["3.9", "3.10", "3.11", "3.12"]
 snakemake = ["7.32.4"]
 
-# [[tool.hatch.envs.test.matrix]]
-# python = ["3.11", "3.12"]
-# snakemake = ["8.5.5"]
+[tool.hatch.v7.test]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+  "snakemake=={matrix:snakemake}"]
 
-[tool.hatch.envs.test]
+[[tool.hatch.envs.v8.matrix]]
+python = ["3.11", "3.12"]
+snakemake = ["8.10.8"]
+
+[tool.hatch.v8.test]
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
@@ -75,7 +81,7 @@ cov = [
 ]
 
 [[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.types]
 dependencies = [

@@ -1,5 +1,9 @@
 from pathlib import Path
-from snakemake import load_configfile
+try:
+    # snakemake < 8.0.0
+    from snakemake import load_configfile
+except ImportError:
+    from snakemake.common.configfile import _load_configfile as load_configfile  # noqa: F401
 
 def get_version_from_config(config_path: Path, config_dict: dict = None) -> str:
     """

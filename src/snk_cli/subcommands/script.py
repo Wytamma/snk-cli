@@ -6,11 +6,11 @@ from typing import List
 import typer
 
 from ..dynamic_typer import DynamicTyper
-from .utils import create_snakemake_workflow
+from snk_cli.conda import conda_environment_factory
 from ..workflow import Workflow
 from rich.console import Console
 from rich.syntax import Syntax
-from snakemake.deployment.conda import Conda, Env
+from snakemake.deployment.conda import Conda
 from snk_cli.config.config import get_config_from_workflow_dir
 
 
@@ -116,14 +116,7 @@ class ScriptApp(DynamicTyper):
         cmd = [executor, f'"{script_path}"'] + args
         if env:
             env_path = self._get_conda_env_path(env)
-            workflow = create_snakemake_workflow(
-                self.snakefile,
-                config=self.snakemake_config,
-                configfiles=[self.configfile] if self.configfile else None,
-                use_conda=True,
-                conda_prefix=self.conda_prefix_dir.resolve(),
-            )
-            env = Env(workflow, env_file=env_path.resolve())
+            env = conda_environment_factory(env_path, self.conda_prefix_dir)
             env.create()
             cmd = self._shellcmd(env.address, " ".join(cmd))
         else:

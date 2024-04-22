@@ -7,7 +7,7 @@ from typing import List, Optional
 import typer
 
 from snk_cli.dynamic_typer import DynamicTyper
-from .utils import create_snakemake_workflow
+from snk_cli.conda import conda_environment_factory
 from ..workflow import Workflow
 from rich.console import Console
 from rich.syntax import Syntax
@@ -22,22 +22,15 @@ def get_num_cores(default=4):
     except:
         return default
 
-def create_conda_environment(args):
-    # unpack args
-    env_path_str, snakefile, snakemake_config, configfiles, conda_prefix_dir_str = args
-    # Reconstruct the snakemake_workflow configuration
+def create_conda_environment_wrapper(args):
+    """
+    This wrapper is designed to be submitted to a ProcessPoolExecutor
+    """
+    env_path_str, conda_prefix_dir_str = args
     conda_prefix_dir = Path(conda_prefix_dir_str).resolve()
-    snakemake_workflow = create_snakemake_workflow(
-        snakefile,
-        config=snakemake_config,
-        configfiles=configfiles,
-        use_conda=True,
-        conda_prefix=conda_prefix_dir,
-    )
     env_path = Path(env_path_str).resolve()
-    env = Env(snakemake_workflow, env_file=env_path)
     try:
-        env.create()
+        conda_environment_factory(env_path, conda_prefix_dir).create()
     except CreateCondaEnvironmentException as e:
         typer.secho(str(e), fg="red", err=True)
         return 1
@@ -57,13 +50,6 @@ class EnvApp(DynamicTyper):
         self.snakemake_config = snakemake_config
         self.snakefile = snakefile
         self.configfile = get_config_from_workflow_dir(self.workflow.path)
-        self.snakemake_workflow = create_snakemake_workflow(
-            self.snakefile,
-            config=self.snakemake_config,
-            configfiles=[self.configfile] if self.configfile else None,
-            use_conda=True,
-            conda_prefix=self.conda_prefix_dir.resolve(),
-        )
         self.register_command(self.list, help="List the environments in the workflow.")
         self.register_command(self.show, help="Show the contents of an environment.")
         self.register_command(
@@ -86,7 +72,7 @@ class EnvApp(DynamicTyper):
 
         table = Table("Name", "CMD", "Env", show_header=True, show_lines=True)
         for env in self.workflow.environments:
-            conda = Env(self.snakemake_workflow, env_file=env.resolve())
+            conda = conda_environment_factory(env, self.conda_prefix_dir)
             # address relative to cwd
             address = Path(conda.address)
             if address.exists():
@@ -137,7 +123,7 @@ class EnvApp(DynamicTyper):
         cmd: List[str] = typer.Argument(..., help="The command to run in environment."),
     ):
         env_path = self._get_conda_env_path(name)
-        env = Env(self.snakemake_workflow, env_file=env_path.resolve())
+        env = conda_environment_factory(env_path, self.conda_prefix_dir)
         env.create()
         cmd = self._shellcmd(env.address, " ".join(cmd))
         if verbose:
@@ -154,7 +140,7 @@ class EnvApp(DynamicTyper):
     ):
         if name:
             env_path = self._get_conda_env_path(name)
-            env = Env(self.snakemake_workflow, env_file=env_path.resolve())
+            env = conda_environment_factory(env_path, self.conda_prefix_dir)
             path = Path(env.address)
             if not path.exists():
                 self.error(f"Environment {name} not created!")
@@ -176,15 +162,12 @@ class EnvApp(DynamicTyper):
         env_args = [
             (
                 path,
-                self.snakefile,
-                self.snakemake_config,
-                [self.configfile] if self.configfile else None,
                 self.conda_prefix_dir.resolve(),
             )
             for path in env_paths 
         ]
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            status_codes = executor.map(create_conda_environment, env_args)
+            status_codes = executor.map(create_conda_environment_wrapper, env_args)
         if any(status_codes):
             self.error("Failed to create all conda environments!")
         if names:
@@ -201,7 +184,7 @@ class EnvApp(DynamicTyper):
     ):
         env_path = self._get_conda_env_path(name)
         self.log(f"Activating {name} environment... (type 'exit' to deactivate)")
-        env = Env(self.snakemake_workflow, env_file=env_path.resolve())
+        env = conda_environment_factory(env_path, self.conda_prefix_dir)
         env.create()
         user_shell = os.environ.get("SHELL", "/bin/bash")
         activate_cmd = self._shellcmd(env.address, user_shell)

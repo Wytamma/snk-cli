@@ -6,8 +6,6 @@ from pathlib import Path
 from typing import Optional
 import os
 
-
-from snakemake import SNAKEFILE_CHOICES
 from art import text2art
 
 from snk_cli.dynamic_typer import DynamicTyper
@@ -224,6 +222,17 @@ class CLI(DynamicTyper):
         Examples:
           >>> CLI._find_snakefile()
         """
+        SNAKEFILE_CHOICES = list(
+            map(
+                Path,
+                (
+                    "Snakefile",
+                    "snakefile",
+                    "workflow/Snakefile",
+                    "workflow/snakefile",
+                ),
+            )
+        )
         for path in SNAKEFILE_CHOICES:
             if (self.workflow.path / path).exists():
                 return self.workflow.path / path

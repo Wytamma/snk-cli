@@ -217,8 +217,8 @@ class DynamicTyper:
             flat_config = None
 
             if kwargs.get("configfile"):
-                from snakemake import load_configfile
                 from .utils import flatten
+                from snk_cli.config.utils import load_configfile
 
                 snakemake_config = load_configfile(kwargs["configfile"])
                 flat_config = flatten(snakemake_config)

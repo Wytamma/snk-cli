@@ -29,9 +29,12 @@ jobs:
       - run: pip install hatch
       - run: sudo apt-get update && sudo apt-get install -y llvm
       - run: sudo apt-get -y install graphviz
-      - name: Run tests
+      - name: Run v7 tests
         shell: bash
-        run: hatch run cov
+        run: hatch run +py=3.11 v7:cov
+      - name: Run v8 tests
+        shell: bash
+        run: hatch run +py=3.11 v8:cov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
 
