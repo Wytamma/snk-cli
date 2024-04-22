@@ -6,11 +6,11 @@ from typing import List
 import typer
 
 from ..dynamic_typer import DynamicTyper
-from snk_cli.env import conda_environment_factory
+from snk_cli.conda import conda_environment_factory
 from ..workflow import Workflow
 from rich.console import Console
 from rich.syntax import Syntax
-from snakemake.deployment.conda import Conda, Env
+from snakemake.deployment.conda import Conda
 from snk_cli.config.config import get_config_from_workflow_dir
 
 

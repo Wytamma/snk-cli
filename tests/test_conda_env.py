@@ -1,4 +1,4 @@
-from snk_cli.env import conda_environment_factory
+from snk_cli.conda import conda_environment_factory
 from snakemake.deployment.conda import Env
 from pathlib import Path
 

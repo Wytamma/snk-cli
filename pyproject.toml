@@ -43,15 +43,21 @@ Source = "https://github.com/unknown/snk-cli"
 path = "src/snk_cli/__about__.py"
 
 
-[[tool.hatch.envs.test.matrix]]
+[[tool.hatch.envs.v7.matrix]]
 python = ["3.9", "3.10", "3.11", "3.12"]
 snakemake = ["7.32.4"]
 
-[[tool.hatch.envs.test.matrix]]
+[tool.hatch.v7.test]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+  "snakemake=={matrix:snakemake}"]
+
+[[tool.hatch.envs.v8.matrix]]
 python = ["3.11", "3.12"]
 snakemake = ["8.10.8"]
 
-[tool.hatch.envs.test]
+[tool.hatch.v8.test]
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",

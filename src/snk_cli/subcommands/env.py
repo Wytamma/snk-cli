@@ -7,7 +7,7 @@ from typing import List, Optional
 import typer
 
 from snk_cli.dynamic_typer import DynamicTyper
-from snk_cli.env import conda_environment_factory
+from snk_cli.conda import conda_environment_factory
 from ..workflow import Workflow
 from rich.console import Console
 from rich.syntax import Syntax
