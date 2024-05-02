@@ -39,3 +39,12 @@ def test_run_with_config(tmp_path):
     assert res.exit_code == 0, res.stderr
     assert "cli" in res.stdout, res.stderr
 
+def test_snakemake_help(local_runner: SnkCliRunner):
+    res = local_runner(["run", "-hs"])
+    assert res.exit_code == 0, res.stderr
+    assert "snakemake" in res.stdout
+
+def test_snakemake_version(local_runner: SnkCliRunner):
+    res = local_runner(["run", "--snake-v"])
+    assert res.exit_code == 0, res.stderr
+    assert res.stdout in ["7.32.4\n", "8.10.8\n"]
