@@ -65,9 +65,7 @@ class RunApp(DynamicTyper):
           >>> RunApp._print_snakemake_help(True)
         """
         if value:
-            import snakemake
-
-            snakemake.main("-h")
+            execute_snakemake("-h")
 
     def run(
         self,
