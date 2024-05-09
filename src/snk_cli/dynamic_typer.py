@@ -11,7 +11,7 @@ class DynamicTyper:
     app: typer.Typer
 
     def __init__(self):
-        self.app = typer.Typer()
+        self.app = typer.Typer(add_completion=False)
 
     def __call__(self):
         """
@@ -33,7 +33,7 @@ class DynamicTyper:
           Sets the app attribute to a Typer object.
         """
         if not hasattr(self, "app"):
-          self.app = typer.Typer()
+          self.app = typer.Typer(add_completion=False)
 
     def register_default_command(self, command: Callable, **command_kwargs) -> None:
         """
