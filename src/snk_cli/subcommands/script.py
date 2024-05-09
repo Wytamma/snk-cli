@@ -50,7 +50,7 @@ class ScriptApp(DynamicTyper):
         table = Table("Name", "CMD", "File", show_header=True, show_lines=True)
         for script in self.workflow.scripts:
             # address relative to cwd
-            table.add_row(script.stem, f"{self.workflow.name} script show {script.stem}", str(script.resolve()) if verbose else script.name)
+            table.add_row(script.stem, f"{self.workflow.name} script run {script.stem} --env ...", str(script.resolve()) if verbose else script.name)
         console = Console()
         console.print(table)
 

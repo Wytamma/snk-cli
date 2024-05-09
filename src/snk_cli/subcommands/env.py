@@ -80,7 +80,7 @@ class EnvApp(DynamicTyper):
                 cmd = f"{self.workflow.name} env activate {env.stem}"
             else:
                 address = ""
-                cmd = f"{self.workflow.name} env show {env.stem}"
+                cmd = f"{self.workflow.name} env create {env.stem}"
             table.add_row(
                 env.stem, cmd, address
             )
