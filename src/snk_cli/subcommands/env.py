@@ -153,7 +153,7 @@ class EnvApp(DynamicTyper):
     def create(
             self, 
             names: Optional[List[str]] = typer.Argument(None, help="The names of the environments to create. If not provided, all environments will be created."),
-            max_workers: int = typer.Option(get_num_cores(), "--workers", "-w", help="Max number of envs to create in parallel.")
+            max_workers: int = typer.Option(1, "--workers", "-w", help="Max number of envs to create in parallel.")
         ):
         if names:
             env_paths = [self._get_conda_env_path(name) for name in names]
