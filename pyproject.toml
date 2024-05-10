@@ -35,9 +35,9 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/unknown/snk-cli#readme"
-Issues = "https://github.com/unknown/snk-cli/issues"
-Source = "https://github.com/unknown/snk-cli"
+Documentation = "https://github.com/wytamma/snk-cli#readme"
+Issues = "https://github.com/wytamma/snk-cli/issues"
+Source = "https://github.com/wytamma/snk-cli"
 
 [tool.hatch.version]
 path = "src/snk_cli/__about__.py"
