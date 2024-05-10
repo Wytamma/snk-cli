@@ -113,7 +113,9 @@ class ScriptApp(DynamicTyper):
     ):
         script_path = self._get_script_path(name)
         executor = self._get_executor(script_path.suffix[1:])
-        cmd = [executor, f'"{script_path}"'] + args
+        cmd = [executor, f'"{script_path}"'] 
+        if args:
+            cmd += args
         if env:
             env_path = self._get_conda_env_path(env)
             env = conda_environment_factory(env_path, self.conda_prefix_dir)
