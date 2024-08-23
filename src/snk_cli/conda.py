@@ -63,7 +63,7 @@ def create_workflow_v8(
         conda_prefix
     ):
     from snakemake.api import Workflow
-    from snakemake.settings import (
+    from snakemake.settings.types import (
         ConfigSettings,
         DeploymentSettings,
         ResourceSettings,
