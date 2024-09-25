@@ -1,7 +1,6 @@
 from pathlib import Path
 import sys
 from typing import Optional
-from git import Repo, InvalidGitRepositoryError
 import importlib.util
 import os
 
@@ -30,60 +29,7 @@ class Workflow:
         """
         self.path = path
         self.editable = self.check_is_editable()
-        if self.editable:  # editable mode
-            self.repo = None
-        else:
-            try:
-                self.repo = Repo(path)
-            except InvalidGitRepositoryError:
-                self.repo = None
         self.name = self.path.name
-
-
-    @property
-    def tag(self):
-        """
-        Gets the tag of the workflow.
-
-        Returns:
-          str: The tag of the workflow, or None if no tag is found.
-        """
-        try:
-            tag = self.repo.git.describe(["--tags", "--exact-match"])
-        except Exception:
-            tag = None
-        return tag
-    
-    @property
-    def commit(self):
-        """
-        Gets the commit SHA of the workflow.
-
-        Returns:
-          str: The commit SHA of the workflow.
-        """
-        try:
-            sha = self.repo.head.object.hexsha
-            commit = self.repo.git.rev_parse(sha, short=8)
-        except Exception:
-           commit = None
-        return commit
-
-    @property
-    def version(self):
-        """
-        Gets the version of the workflow.
-
-        Returns:
-          str: The version of the workflow, or None if no version is found.
-        """
-        if self.repo is None:
-            return None
-        if self.tag:
-            version = self.tag
-        else:
-            version = self.commit
-        return version
 
     @property
     def executable(self):
