@@ -15,6 +15,7 @@ from snk_cli.config.config import (
     SnkConfig,
     load_workflow_snakemake_config,
 )
+from snk_cli.config.utils import load_configfile
 from snk_cli.options.utils import build_dynamic_cli_options
 from snk_cli.workflow import Workflow
 
@@ -52,7 +53,7 @@ class CLI(DynamicTyper):
         if workflow_dir_path.is_file():
             workflow_dir_path = workflow_dir_path.parent
         self.workflow = Workflow(path=workflow_dir_path)
-        self.snakemake_config = load_workflow_snakemake_config(workflow_dir_path)
+        
         if snk_config is None:
             self.snk_config = SnkConfig.from_workflow_dir(
                 workflow_dir_path, create_if_not_exists=True
@@ -63,7 +64,12 @@ class CLI(DynamicTyper):
             self.version = self.workflow.version
         else: 
             self.version = self.snk_config.version
+        if self.snk_config.configfile:
+             self.snakemake_config = load_configfile(self.snk_config.configfile)
+        else:
+            self.snakemake_config = load_workflow_snakemake_config(workflow_dir_path)
         self.options = build_dynamic_cli_options(self.snakemake_config, self.snk_config)
+        print(self.options)
         # try to load the snakefile from the snakemake config
         snakefile = self.snk_config.snakefile
         if not snakefile:
@@ -126,7 +132,6 @@ class CLI(DynamicTyper):
                 EnvApp(
                     workflow=self.workflow,
                     conda_prefix_dir=self.conda_prefix_dir,
-                    snakemake_config=self.snakemake_config,
                 ),
                 name="env",
                 help="Access the workflow conda environments.",
@@ -136,7 +141,6 @@ class CLI(DynamicTyper):
                 ScriptApp(
                     workflow=self.workflow,
                     conda_prefix_dir=self.conda_prefix_dir,
-                    snakemake_config=self.snakemake_config,
                 ),
                 name="script",
                 help="Access the workflow scripts.",

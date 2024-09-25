@@ -28,9 +28,17 @@ def test_snk_config_commands_run_only(tmp_path):
     assert "profile" not in res.stdout, res.stderr
 
 def test_non_standard_snakefile(tmp_path):
-    runner = dynamic_runner({}, SnkConfig(snakefile=tmp_path / "Snakefile2"), tmp_path=tmp_path)
     with open(tmp_path / "Snakefile2", "w") as f:
         f.write("print('Snakefile2')")
+    runner = dynamic_runner({}, SnkConfig(snakefile=tmp_path / "Snakefile2"), tmp_path=tmp_path)
     res = runner.invoke(["run"])
     assert res.exit_code == 0, res.stderr
     assert "Snakefile2" in res.stdout, res.stderr
+
+def test_non_standard_configfile(tmp_path):
+    with open(tmp_path / "config2.yaml", "w") as f:
+        f.write("value: config2")
+    runner = dynamic_runner({}, SnkConfig(configfile=tmp_path / "config2.yaml"), tmp_path=tmp_path)
+    res = runner.invoke(["run"])
+    assert res.exit_code == 0, res.stderr
+    assert "config2" in res.stdout, res.stderr

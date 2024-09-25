@@ -72,6 +72,7 @@ class SnkConfig:
     additional_snakemake_args: List[str] = field(default_factory=list)
     commands: List[str] = field(default_factory=lambda: ["run", "script", "env", "profile", "info", "config"])
     snakefile: Optional[Path] = None
+    configfile: Optional[Path] = None
     cli: dict = field(default_factory=dict)
     _snk_config_path: Path = None
 
@@ -113,7 +114,8 @@ class SnkConfig:
         ]
         snk_config.validate_resources(snk_config.resources)
         snk_config._snk_config_path = snk_config_path
-        snk_config.snakefile = Path(snk_config.snakefile)
+        snk_config.snakefile = Path(snk_config.snakefile) if snk_config.snakefile else None
+        snk_config.configfile = Path(snk_config.configfile) if snk_config.configfile else None
         return snk_config
   
     @classmethod

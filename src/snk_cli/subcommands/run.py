@@ -197,7 +197,10 @@ class RunApp(DynamicTyper):
             args.append(f"--snakefile={self.snakefile}")
 
         if not configfile:
-            configfile = get_config_from_workflow_dir(self.workflow.path)
+            if self.snk_config.configfile:
+                configfile = self.snk_config.configfile
+            else:
+                configfile = get_config_from_workflow_dir(self.workflow.path)
         if configfile:
             args.append(f"--configfile={configfile}")
 

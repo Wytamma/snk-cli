@@ -44,13 +44,13 @@ path = "src/snk_cli/__about__.py"
 
 
 [[tool.hatch.envs.snakemake.matrix]]
-snakemake = ["7.32.4", "8.10.8"]
+snakemake = ["==7.32.4", ">8"]
 
 [tool.hatch.envs.default]
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
-  "snakemake=={matrix:snakemake:7.32.4}",
+  "snakemake{matrix:snakemake:==7.32.4}",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
