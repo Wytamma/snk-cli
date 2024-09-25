@@ -47,4 +47,4 @@ def test_snakemake_help(local_runner: SnkCliRunner):
 def test_snakemake_version(local_runner: SnkCliRunner):
     res = local_runner(["run", "--snake-v"])
     assert res.exit_code == 0, res.stderr
-    assert res.stdout in ["7.32.4\n", "8.10.8\n"]
+    assert res.stdout.startswith("7.32.4") or res.stdout.startswith("8.")

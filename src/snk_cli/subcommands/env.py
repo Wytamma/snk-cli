@@ -42,14 +42,9 @@ class EnvApp(DynamicTyper):
         self,
         workflow: Workflow,
         conda_prefix_dir: Path,
-        snakemake_config,
-        snakefile: Path,
     ):
         self.workflow = workflow
         self.conda_prefix_dir = conda_prefix_dir
-        self.snakemake_config = snakemake_config
-        self.snakefile = snakefile
-        self.configfile = get_config_from_workflow_dir(self.workflow.path)
         self.register_command(self.list, help="List the environments in the workflow.")
         self.register_command(self.show, help="Show the contents of an environment.")
         self.register_command(
