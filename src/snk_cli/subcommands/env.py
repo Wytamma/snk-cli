@@ -11,8 +11,7 @@ from snk_cli.conda import conda_environment_factory
 from ..workflow import Workflow
 from rich.console import Console
 from rich.syntax import Syntax
-from snakemake.deployment.conda import Conda, Env, CreateCondaEnvironmentException
-from snk_cli.config.config import get_config_from_workflow_dir
+from snakemake.deployment.conda import Conda, CreateCondaEnvironmentException
 
 from concurrent.futures import ProcessPoolExecutor
 

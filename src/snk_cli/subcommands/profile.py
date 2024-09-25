@@ -78,31 +78,28 @@ class ProfileApp(DynamicTyper):
         import os
         import platform
 
-        try:
-            if platform.system() == "Windows":
-                os.startfile(file_path)
-            elif platform.system() == "Darwin":  # macOS
-                subprocess.call(("open", file_path))
-            else:  # Linux and other Unix-like systems
-                editors = ["nano", "vim", "vi"]
-                editor = None
-                for e in editors:
-                    if (
-                        subprocess.call(
-                            ["which", e], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                        )
-                        == 0
-                    ):
-                        editor = e
-                        break
-                if editor:
-                    subprocess.call([editor, file_path])
-                else:
-                    self.error(
-                        "No suitable text editor found. Please install nano or vim."
+        if platform.system() == "Windows":
+            os.startfile(file_path)
+        elif platform.system() == "Darwin":  # macOS
+            subprocess.call(("open", file_path))
+        else:  # Linux and other Unix-like systems
+            editors = ["nano", "vim", "vi"]
+            editor = None
+            for e in editors:
+                if (
+                    subprocess.call(
+                        ["which", e], stdout=subprocess.PIPE, stderr=subprocess.PIPE
                     )
-        except Exception as e:
-            self.error(f"An error occurred: {e}")
+                    == 0
+                ):
+                    editor = e
+                    break
+            if editor:
+                subprocess.call([editor, file_path])
+            else:
+                self.error(
+                    "No suitable text editor found. Please install nano or vim."
+                )
 
     def edit(self, name: str = typer.Argument(..., help="The name of the profile.")):
         profile_path = self._get_profile_path(name)

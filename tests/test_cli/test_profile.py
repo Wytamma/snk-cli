@@ -15,7 +15,8 @@ def mock_platform_system():
 
 @pytest.fixture
 def mock_os_startfile():
-    if platform.system() == 'Windows':
+    # Only patch os.startfile if the platform is Windows
+    if hasattr(os, 'startfile'):
         with patch('os.startfile') as mock:
             yield mock
     else:
@@ -26,6 +27,7 @@ def mock_subprocess_call():
     with patch('subprocess.call') as mock:
         yield mock
 
+@pytest.mark.skipif(platform.system() != 'Windows', reason="Requires Windows")
 def test_open_text_editor_windows(mock_platform_system, mock_os_startfile, local_runner: SnkCliRunner):
     mock_platform_system.return_value = 'Windows'
     file_path = Path('tests/data/workflow/workflow/profiles/slurm/config.yaml')
@@ -48,7 +50,7 @@ def test_open_text_editor_linux(mock_platform_system, mock_subprocess_call, loca
     file_path = Path('tests/data/workflow/workflow/profiles/slurm/config.yaml')
     
     with patch('subprocess.call') as mock_call:
-        mock_call.side_effect = [1, 1, 0]  # Mocking 'which' command results: nano not found, vim not found, vi found
+        mock_call.side_effect = [1, 1, 0, 0]  # Mocking 'which' command results: nano not found, vim not found, vi found
         
         res = local_runner(["profile", "edit", "slurm"])
         assert res.exit_code == 0, res.stderr
@@ -65,5 +67,5 @@ def test_open_text_editor_no_editor_found(mock_platform_system, mock_subprocess_
 
         with patch('typer.secho') as mock_print:
             res = local_runner(["profile", "edit", "slurm"])
-            assert res.exit_code == 0, res.stderr
+            assert res.exit_code == 1, res.stderr
             mock_print.assert_called_once_with("No suitable text editor found. Please install nano or vim.", fg='red', err=True)
