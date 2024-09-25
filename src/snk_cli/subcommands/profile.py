@@ -102,7 +102,7 @@ class ProfileApp(DynamicTyper):
                         "No suitable text editor found. Please install nano or vim."
                     )
         except Exception as e:
-            print(f"An error occurred: {e}")
+            self.error(f"An error occurred: {e}")
 
     def edit(self, name: str = typer.Argument(..., help="The name of the profile.")):
         profile_path = self._get_profile_path(name)

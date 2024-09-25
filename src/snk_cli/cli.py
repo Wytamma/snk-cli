@@ -60,16 +60,12 @@ class CLI(DynamicTyper):
             )
         else:
             self.snk_config = snk_config
-        if self.workflow.version:
-            self.version = self.workflow.version
-        else: 
-            self.version = self.snk_config.version
+        self.version = self.snk_config.version
         if self.snk_config.configfile:
              self.snakemake_config = load_configfile(self.snk_config.configfile)
         else:
             self.snakemake_config = load_workflow_snakemake_config(workflow_dir_path)
         self.options = build_dynamic_cli_options(self.snakemake_config, self.snk_config)
-        print(self.options)
         # try to load the snakefile from the snakemake config
         snakefile = self.snk_config.snakefile
         if not snakefile:
