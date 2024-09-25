@@ -69,7 +69,7 @@ def test_create_option_from_annotation_with_enums(
         "test", default_annotation_values, default_default_values
     )
 
-    assert option.enums == ["a", "b", "c"]
+    assert option.choices == ["a", "b", "c"]
 
 
 @pytest.fixture
