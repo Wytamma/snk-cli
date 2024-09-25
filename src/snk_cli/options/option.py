@@ -16,3 +16,4 @@ class Option:
     short_flag: Optional[str]
     hidden: bool = False
     from_annotation: bool = False
+    choices: Optional[list] = None

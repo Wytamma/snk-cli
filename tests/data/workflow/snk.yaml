@@ -9,6 +9,8 @@ cli:
     type: bool
   null_annotation:
     default: null
+  enum:
+    choices: [a, b, c]
   test:
     another:
       test:

@@ -42,3 +42,10 @@ def test_non_standard_configfile(tmp_path):
     res = runner.invoke(["run"])
     assert res.exit_code == 0, res.stderr
     assert "config2" in res.stdout, res.stderr
+
+def test_snk_config_with_enums(tmp_path):
+    runner = dynamic_runner({}, SnkConfig(cli={"test": {"choices": ["enum1", "enum2"], "type": "enum"}}), tmp_path=tmp_path)
+    res = runner.invoke(["run", "--help"])
+    assert res.exit_code == 0, res.stderr
+    assert "enum1" in res.stdout, res.stderr
+    assert "enum2" in res.stdout, res.stderr

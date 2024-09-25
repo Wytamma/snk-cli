@@ -1,8 +1,9 @@
-from typing import List, Any
+from typing import List
 from ..config.config import SnkConfig
 from ..utils import get_default_type, flatten
 from .option import Option
 from pathlib import Path
+from enum import Enum
 
 types = {
     "int": int,
@@ -17,6 +18,7 @@ types = {
     "list[str]": List[str],
     "list[path]": List[Path],
     "list[int]": List[int],
+    "enum": Enum,
 }
 
 def get_keys_from_annotation(annotations):
@@ -78,6 +80,7 @@ def create_option_from_annotation(
         short_flag=f"-{short}" if short else None,
         hidden=hidden,
         from_annotation=from_annotation,
+        choices=annotation_values.get(f"{annotation_key}:choices", None),
     )
 
 

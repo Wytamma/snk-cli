@@ -35,8 +35,41 @@ def test_create_option_from_annotation(
     assert option.default == "default_value"
     assert option.updated is False
     assert option.help == "Test help"
-    assert option.type == str
+    assert option.type is str
     assert option.required is True
+
+def test_create_option_from_annotation_with_short(
+    default_annotation_values, default_default_values
+):
+    default_annotation_values["test:short"] = "t"
+
+    option = create_option_from_annotation(
+        "test", default_annotation_values, default_default_values
+    )
+
+    assert option.short == "t"
+
+def test_create_option_from_annotation_with_hidden(
+    default_annotation_values, default_default_values
+):
+    default_annotation_values["test:hidden"] = True
+
+    option = create_option_from_annotation(
+        "test", default_annotation_values, default_default_values
+    )
+
+    assert option.hidden is True
+
+def test_create_option_from_annotation_with_enums(
+    default_annotation_values, default_default_values
+):
+    default_annotation_values["test:choices"] = ["a", "b", "c"]
+
+    option = create_option_from_annotation(
+        "test", default_annotation_values, default_default_values
+    )
+
+    assert option.enums == ["a", "b", "c"]
 
 
 @pytest.fixture

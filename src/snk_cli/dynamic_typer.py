@@ -2,6 +2,7 @@ import typer
 from typing import List, Callable
 from inspect import signature, Parameter
 from makefun import with_signature
+from enum import Enum
 
 from .options import Option
 import sys
@@ -146,17 +147,25 @@ class DynamicTyper:
           >>> create_cli_parameter(option)
           Parameter('foo', kind=Parameter.POSITIONAL_OR_KEYWORD, default=typer.Option(..., help='[CONFIG] A number'), annotation=int)
         """
+        annotation_type = option.type
+        default = option.default
+        if option.type is Enum or option.choices:
+            if not option.choices:
+                raise ValueError(f"Enum type {option.name} requires choices to be defined.")
+            annotation_type = Enum('DynamicEnum', {e: e for e in option.choices})
+            if default:
+              default = annotation_type(default)
         return Parameter(
             option.name,
             kind=Parameter.POSITIONAL_OR_KEYWORD,
             default=typer.Option(
-                ... if option.required else option.default,
+                ... if option.required else default,
                 *[option.flag, option.short_flag] if option.short else [],
                 help=f"{option.help}",
                 rich_help_panel="Workflow Configuration",
                 hidden=option.hidden,
             ),
-            annotation=option.type,
+            annotation=annotation_type,
         )
 
     def check_if_option_passed_via_command_line(self, option: Option):
