@@ -152,7 +152,7 @@ class DynamicTyper:
         if option.type is Enum or option.choices:
             if not option.choices:
                 raise ValueError(f"Enum type {option.name} requires choices to be defined.")
-            annotation_type = Enum(f'{option.name}', {e: e for e in option.choices})
+            annotation_type = Enum(f'{option.name}', {str(e): str(e) for e in option.choices})
             if default:
               try:
                 default = annotation_type(default)
