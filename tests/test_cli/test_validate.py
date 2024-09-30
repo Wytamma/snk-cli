@@ -24,6 +24,12 @@ import pytest
         {"example": {"type": "bool"}},
         {"example": True}
     ),
+    # timestamp
+    (
+        {"example": "2021-01-01T00:00:00"},
+        {"example": {"type": "str"}},
+        {"example": "2021-01-01T00:00:00"}
+    ),
     # None
     (
         {"example": None},
