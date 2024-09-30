@@ -205,6 +205,17 @@ class SnkConfig:
           >>> snk_config.to_yaml(Path("snk.yaml"))
         """
         config_dict = {k: v for k, v in vars(self).items() if not k.startswith("_")}
+        def convert_paths(data):
+            if isinstance(data, dict):
+                return {key: convert_paths(value) for key, value in data.items()}
+            elif isinstance(data, list):
+                return [convert_paths(item) for item in data]
+            elif isinstance(data, Path):
+                return str(data)
+            return data
+        
+        config_dict = convert_paths(config_dict)
+
         with open(path, "w") as f:
             yaml.dump(config_dict, f)
 
