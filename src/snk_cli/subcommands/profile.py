@@ -65,7 +65,7 @@ class ProfileApp(DynamicTyper):
             console = Console()
             console.print(syntax)
         else:
-            typer.echo(profile_file_text)
+            self.echo(profile_file_text)
 
     def _open_text_editor(self, file_path):
         """

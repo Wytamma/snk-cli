@@ -106,7 +106,7 @@ class EnvApp(DynamicTyper):
             console = Console()
             console.print(syntax)
         else:
-            typer.echo(env_file_text)
+            self.echo(env_file_text)
 
     def run(
         self,

@@ -259,5 +259,5 @@ class CLI(DynamicTyper):
         info_dict["conda_prefix_dir"] = str(self.conda_prefix_dir)
         info_dict["singularity_prefix_dir"] = str(self.singularity_prefix_dir)
         info_dict["workflow_dir_path"] = str(self.workflow.path)
-        typer.echo(json.dumps(info_dict, indent=2))
+        self.echo(json.dumps(info_dict, indent=2))
 

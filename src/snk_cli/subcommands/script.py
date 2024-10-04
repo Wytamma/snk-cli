@@ -79,7 +79,7 @@ class ScriptApp(DynamicTyper):
             console = Console()
             console.print(code)
         else:
-            typer.echo(code)
+            self.echo(code)
 
     def _get_executor(self, suffix: str) -> str:
         if suffix == "py":

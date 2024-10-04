@@ -66,4 +66,4 @@ class ConfigApp(DynamicTyper):
             console = Console()
             console.print(syntax)
         else:
-            typer.echo(yaml_str)
+            self.echo(yaml_str)

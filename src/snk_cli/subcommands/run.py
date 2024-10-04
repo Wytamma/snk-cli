@@ -213,10 +213,9 @@ class RunApp(DynamicTyper):
         # Set up conda frontend
         conda_found = check_command_available("conda")
         if not conda_found and verbose:
-            typer.secho(
+            self.log(
                 "Conda not found! Install conda to use environments.\n",
-                fg=typer.colors.MAGENTA,
-                err=True,
+                color=typer.colors.MAGENTA,
             )
 
         if conda_found and self.snk_config.conda and not no_conda:
@@ -228,10 +227,9 @@ class RunApp(DynamicTyper):
             )
             if not check_command_available("mamba"):
                 if verbose:
-                    typer.secho(
+                    self.log(
                         "Could not find mamba, using conda instead...",
-                        fg=typer.colors.MAGENTA,
-                        err=True,
+                        color=typer.colors.MAGENTA,
                     )
                 args.append("--conda-frontend=conda")
             else:
@@ -260,7 +258,7 @@ class RunApp(DynamicTyper):
         if configs:
             args.extend(["--config", *configs])
         if verbose:
-            typer.secho(f"snakemake {' '.join(args)}\n", fg=typer.colors.MAGENTA, err=True)
+            self.log(f"snakemake {' '.join(args)}\n", color=typer.colors.MAGENTA)
         if not keep_snakemake and Path(".snakemake").exists():
             keep_snakemake = True
         try:
@@ -281,7 +279,7 @@ class RunApp(DynamicTyper):
                 if status:
                     sys.exit(status)
         if not keep_snakemake and Path(".snakemake").exists():
-            typer.secho("Cleaning up '.snakemake' folder... use --keep-snakemake to keep.", fg=typer.colors.YELLOW, err=True)
+            self.log("Cleaning up '.snakemake' folder... use --keep-snakemake to keep.")
             shutil.rmtree(".snakemake")
 
     def _save_dag(self, snakemake_args: List[str], filename: Path):
@@ -320,7 +318,7 @@ class RunApp(DynamicTyper):
             )
             with open(filename, "w") as output_file:
                 if self.verbose:
-                    typer.secho(f"Saving dag to {filename}", fg=typer.colors.MAGENTA, err=True)
+                    self.log(f"Saving dag to {filename}", color=typer.colors.MAGENTA)
                 subprocess.run(["cat"], stdin=dot_process.stdout, stdout=output_file)
         except (subprocess.CalledProcessError, FileNotFoundError):
             self.error("Graphviz `dot` command not found! Please install.", exit=True)
@@ -354,10 +352,9 @@ class RunApp(DynamicTyper):
 
         def copy_resource(src: Path, dst: Path, symlink: bool = False):
             if self.verbose:
-                typer.secho(
+                self.log(
                     f"  - Copying resource '{src}' to '{dst}'",
-                    fg=typer.colors.MAGENTA,
-                    err=True,
+                    color=typer.colors.MAGENTA,
                 )
             target_is_directory = src.is_dir()
             if symlink:
@@ -379,10 +376,9 @@ class RunApp(DynamicTyper):
         if resources_folder.exists():
             resources.insert(0, Path("resources"))
         if self.verbose and resources:
-            typer.secho(
+            self.log(
                 f"Copying {len(resources)} resources to working directory...",
-                fg=typer.colors.MAGENTA,
-                err=True,
+                color=typer.colors.MAGENTA
             )
         try:
             for resource in resources:
@@ -393,10 +389,9 @@ class RunApp(DynamicTyper):
                     copy_resource(abs_path, destination, symlink=symlink_resources)
                     copied_resources.append(destination)
                 elif self.verbose:
-                    typer.secho(
+                    self.log(
                         f"  - Resource '{resource.name}' already exists! Skipping...",
-                        fg=typer.colors.MAGENTA,
-                        err=True,
+                        color=typer.colors.MAGENTA,
                     )
             yield
         finally:
@@ -405,10 +400,9 @@ class RunApp(DynamicTyper):
             for copied_resource in copied_resources:
                 if copied_resource.exists():
                     if self.verbose:
-                        typer.secho(
+                        self.log(
                             f"Deleting '{copied_resource.name}' resource...",
-                            fg=typer.colors.MAGENTA,
-                            err=True,
+                            color=typer.colors.MAGENTA,
                         )
                     remove_resource(copied_resource)
 
