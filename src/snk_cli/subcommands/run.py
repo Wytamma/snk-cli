@@ -323,8 +323,7 @@ class RunApp(DynamicTyper):
                     typer.secho(f"Saving dag to {filename}", fg=typer.colors.MAGENTA, err=True)
                 subprocess.run(["cat"], stdin=dot_process.stdout, stdout=output_file)
         except (subprocess.CalledProcessError, FileNotFoundError):
-            typer.echo("dot command not found!", fg=typer.colors.RED, err=True)
-            raise typer.Exit(1)
+            self.error("Graphviz `dot` command not found! Please install.", exit=True)
 
     @contextmanager
     def _copy_resources(
