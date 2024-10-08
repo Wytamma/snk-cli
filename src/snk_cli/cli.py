@@ -82,6 +82,11 @@ class CLI(DynamicTyper):
         ):
             os.environ["CONDA_SUBDIR"] = "osx-64"
 
+        if platform.system() in ["Linux", "Darwin"] and not os.environ.get("XDG_CACHE_HOME"):
+            # this prevents OSError: [Errno 39] Directory not empty: 'envs'
+            # on older versions of snakemake
+            os.environ["XDG_CACHE_HOME"] = f"/tmp/.cache/{self.name}"
+
         # dynamically create the logo
         self.logo = self._create_logo(
             tagline=self.snk_config.tagline, font=self.snk_config.font
