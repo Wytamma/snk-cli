@@ -1,4 +1,4 @@
 # SPDX-FileCopyrightText: 2024-present Wytamma Wirth <wytamma.wirth@me.com>
 #
 # SPDX-License-Identifier: MIT
-__version__ = "0.5.4"
+__version__ = "0.5.5"
