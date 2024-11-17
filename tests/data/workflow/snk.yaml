@@ -9,6 +9,10 @@ cli:
     type: bool
   null_annotation:
     default: null
+  KeyValuePair:
+    default: ["key", "value"]
+    help: A key-value pair
+    type: pair 
   enum:
     choices: [a, b, c]
   test:
