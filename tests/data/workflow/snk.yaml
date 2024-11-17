@@ -1,4 +1,5 @@
 art: null
+invalid: false
 cli:
   hidden:
     hidden: true

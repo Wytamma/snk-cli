@@ -112,6 +112,14 @@ class SnkConfig:
             # TODO: remove conda_required in the future
             snk_config_dict["conda"] = snk_config_dict["conda_required"]
             del snk_config_dict["conda_required"]
+        # print warning about any invalid keys
+        fields = set(cls.__dict__["__dataclass_fields__"])
+        invalid_config_keys = set(snk_config_dict.keys()) - fields
+        if invalid_config_keys:
+            import warnings
+            warnings.warn(f"invalid keys in `snk.yaml` file: {invalid_config_keys}.")
+        # filer out any invalid keys
+        snk_config_dict = {k: v for k, v in snk_config_dict.items() if k in fields}
         snk_config = cls(**snk_config_dict)
         snk_config.resources = [
             snk_config_path.parent / resource for resource in snk_config.resources
