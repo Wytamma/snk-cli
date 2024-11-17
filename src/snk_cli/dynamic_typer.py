@@ -1,5 +1,6 @@
 import typer
-from typing import List, Callable
+from click import Tuple
+from typing import List, Callable, get_origin
 from inspect import signature, Parameter
 from makefun import with_signature
 from enum import Enum
@@ -7,7 +8,9 @@ from enum import Enum
 from .options import Option
 import sys
 
-
+def parse_colon_separated_pair(value: str):
+    return tuple(value.split(sep=':', maxsplit=2))
+    
 class DynamicTyper:
     app: typer.Typer
 
@@ -150,12 +153,19 @@ class DynamicTyper:
         annotation_type = option.type
         default = option.default
         if option.choices:
-            annotation_type = Enum(f'{option.name}', {str(e): annotation_type(e) for e in option.choices})
             if default:
               try:
                 default = annotation_type(default)
               except ValueError:
                 raise ValueError(f"Default value '{default}' for option '{option.name}' is not a valid choice.")
+            annotation_type = Enum(f'{option.name}', {str(e): annotation_type(e) for e in option.choices})
+        metavar, parser = None, None
+        if get_origin(annotation_type) is dict or annotation_type is dict:
+            metavar = "KEY:VALUE"
+            parser = parse_colon_separated_pair
+            annotation_type = List[Tuple]
+            if type(default) is dict:
+                default = [f"{k}:{v}" for k, v in default.items()]
         return Parameter(
             option.name,
             kind=Parameter.POSITIONAL_OR_KEYWORD,
@@ -165,6 +175,8 @@ class DynamicTyper:
                 help=f"{option.help}",
                 rich_help_panel="Workflow Configuration",
                 hidden=option.hidden,
+                metavar=metavar,
+                parser=parser,
             ),
             annotation=annotation_type,
         )
@@ -236,8 +248,15 @@ class DynamicTyper:
             for snk_cli_option in options:
 
                 def add_option_to_args():
-                    kwargs["ctx"].args.extend([f"--{snk_cli_option.name}", kwargs[snk_cli_option.name]])
-
+                    value = kwargs[snk_cli_option.name]
+                    if (snk_cli_option.type is dict or get_origin(snk_cli_option.type) is dict) and isinstance(value, list):
+                        # Convert the list of tuples to a dictionary
+                        value = dict(kwargs[snk_cli_option.name])
+                        if get_origin(snk_cli_option.type) is dict:
+                            # get the value type from the type hint
+                            value_type = snk_cli_option.type.__args__[1]
+                            value = {k: value_type(v) for k, v in value.items()}
+                    kwargs["ctx"].args.extend([f"--{snk_cli_option.name}", value])
                 passed_via_command_line = self.check_if_option_passed_via_command_line(
                     snk_cli_option
                 )
