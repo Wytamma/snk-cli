@@ -167,7 +167,7 @@ def test_choices(snakemake_config, annotations, cli_args, expected):
     # dict
     (
         {"example": {"key": "value"}},
-        {"example": {"type": "dict", "default": ["key:value"]}},
+        {"example": {"type": "dict", "default": [["key", "value"]]}},
         [],
         "{'example': {'key': 'value'}}"
     ),
@@ -186,7 +186,7 @@ def test_choices(snakemake_config, annotations, cli_args, expected):
     (
         {},
         {"example": {"type": "dict[str, str]"}},
-        ["--example", "new:2"],
+        ["--example", "new", "2"],
         "{'example': {'new': '2'}}"
     )
     ])

@@ -8,8 +8,6 @@ from enum import Enum
 from .options import Option
 import sys
 
-def parse_colon_separated_pair(value: str):
-    return tuple(value.split(sep=':', maxsplit=2))
     
 class DynamicTyper:
     app: typer.Typer
@@ -159,13 +157,14 @@ class DynamicTyper:
               except ValueError:
                 raise ValueError(f"Default value '{default}' for option '{option.name}' is not a valid choice.")
             annotation_type = Enum(f'{option.name}', {str(e): annotation_type(e) for e in option.choices})
-        metavar, parser = None, None
+        click_type = None
         if get_origin(annotation_type) is dict or annotation_type is dict:
-            metavar = "KEY:VALUE"
-            parser = parse_colon_separated_pair
+            click_type = Tuple([str, str])
+            if hasattr(annotation_type, '__args__') and len(annotation_type.__args__) == 2:
+                click_type = Tuple([str, annotation_type.__args__[1]])
             annotation_type = List[Tuple]
             if type(default) is dict:
-                default = [f"{k}:{v}" for k, v in default.items()]
+                default = [[k, v] for k, v in default.items()]
         return Parameter(
             option.name,
             kind=Parameter.POSITIONAL_OR_KEYWORD,
@@ -175,8 +174,7 @@ class DynamicTyper:
                 help=f"{option.help}",
                 rich_help_panel="Workflow Configuration",
                 hidden=option.hidden,
-                metavar=metavar,
-                parser=parser,
+                click_type=click_type,
             ),
             annotation=annotation_type,
         )

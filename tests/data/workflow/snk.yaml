@@ -12,14 +12,14 @@ cli:
   KeyValuePair:
     default: ["key", "value"]
     help: A key-value pair
-    type: pair 
+    type: pair[str, str]
   enum:
     choices: [a, b, c]
     default: "a"
   dict:
     help: A dictionary
     type: dict[str, int]
-    default: ["key:1"]
+    default: [["key", 1], ["key2", 2]]
   test:
     another:
       test:
