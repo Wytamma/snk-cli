@@ -30,7 +30,7 @@ def check_command_available(command: str):
     return which(command) is not None
 
 
-def flatten(d, parent_key="", sep=":"):
+def flatten(d, parent_key="", sep=":", stop_at=[]):
     """
     Flattens a nested dictionary.
 
@@ -50,8 +50,11 @@ def flatten(d, parent_key="", sep=":"):
     items = []
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k
-        if isinstance(v, MutableMapping):
-            items.extend(flatten(v, new_key, sep=sep).items())
+        if new_key in stop_at:
+            # this allows dict to be flattened up to a certain level so we can have dict types
+            items.append((new_key, v))
+        elif isinstance(v, MutableMapping):
+            items.extend(flatten(v, new_key, sep=sep, stop_at=stop_at).items())
         else:
             items.append((new_key, v))
     return dict(items)

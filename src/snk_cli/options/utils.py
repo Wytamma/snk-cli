@@ -20,6 +20,9 @@ types = {
     "list[int]": List[int],
     "list[float]": List[float],
     "pair": Tuple[str, str],
+    "dict": dict,
+    "dict[str, str]": dict[str, str],
+    "dict[str, int]": dict[str, int],
 }
 
 # Define the basic types for the combinations
@@ -111,9 +114,9 @@ def build_dynamic_cli_options(
     Returns:
       List[dict]: A list of options.
     """
-    flat_config = flatten(snakemake_config)
     flat_annotations = flatten(snk_config.cli)
     annotation_keys = get_keys_from_annotation(flat_annotations)
+    flat_config = flatten(snakemake_config, stop_at=annotation_keys)
     options = {}
 
     # For every parameter in the config, create an option from the corresponding annotation
