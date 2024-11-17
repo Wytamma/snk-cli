@@ -37,6 +37,9 @@ class SnkConfig:
       skip_missing (bool): Whether to skip missing CLI options. Defaults to False.
       additional_snakemake_args (List[str]): List of additional Snakemake command-line arguments. Defaults to an empty list.
       commands (List[str]): List of subcommands to include in the CLI. Defaults to ["run", "script", "env", "profile", "info", "config"].
+      snakefile (Optional[Path]): Path to the Snakefile. Defaults to None.
+      configfile (Optional[Path]): Path to the config file. Defaults to None.
+      min_snk_cli_version (Optional[str]): Minimum version of the SNK CLI required to run the workflow. Defaults to None.
       cli (dict): Dictionary of CLI options and their values. Defaults to an empty dictionary.
       _snk_config_path (Path): The path to the SNK config file. Defaults to None.
 
@@ -73,6 +76,7 @@ class SnkConfig:
     commands: List[str] = field(default_factory=lambda: ["run", "script", "env", "profile", "info", "config"])
     snakefile: Optional[Path] = None
     configfile: Optional[Path] = None
+    min_snk_cli_version: Optional[str] = None
     cli: dict = field(default_factory=dict)
     _snk_config_path: Path = None
 
