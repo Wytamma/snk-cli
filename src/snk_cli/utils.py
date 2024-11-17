@@ -97,6 +97,9 @@ def serialise(d):
     """
     if isinstance(d, Path) or isinstance(d, datetime):
         return str(d)
+    
+    if isinstance(d, tuple):
+        return list(d) 
 
     if isinstance(d, list):
         return [serialise(x) for x in d]
@@ -155,7 +158,7 @@ def parse_config_args(args: List[str], options: List[Option]):
 
 def get_default_type(v):
     default_type = type(v)
-    if default_type == list and len(v) > 0:
+    if default_type is list and len(v) > 0:
         return f"List[{type(v[0]).__name__}]"
     return str(default_type.__name__)
 
