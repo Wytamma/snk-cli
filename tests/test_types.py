@@ -148,9 +148,49 @@ def test_pair(snakemake_config, annotations, cli_args, expected):
         {"example": {"type": "int", "choices": [1, 2, 3]}},
         ["--example", 1],
         "{'example': 1}"
-    ) 
+    ),
+    (
+        {"example": 1},
+        {"example": {"type": "int", "choices": [2, 3], "default": 2}},
+        [],
+        "{'example': 2}"
+    ),
     ])
 def test_choices(snakemake_config, annotations, cli_args, expected):
+    snk_config = SnkConfig(cli=annotations)
+    runner = dynamic_runner(snakemake_config, snk_config)
+    res = runner.invoke(["run"] + cli_args)
+    assert res.exit_code == 0, res.stderr
+    assert expected in res.stdout, res.stderr
+
+@pytest.mark.parametrize("snakemake_config,annotations,cli_args,expected", [
+    # dict
+    (
+        {"example": {"key": "value"}},
+        {"example": {"type": "dict", "default": ["key:value"]}},
+        [],
+        "{'example': {'key': 'value'}}"
+    ),
+    (
+        {"example": {"key": "value"}},
+        {"example": {"type": "dict"}},
+        [],
+        "{'example': {'key': 'value'}}"
+    ),
+    (
+        {"example": {"number": 1}},
+        {"example": {"type": "dict[str, int]"}},
+        [],
+        "{'example': {'number': 1}}"
+    ),
+    (
+        {},
+        {"example": {"type": "dict[str, str]"}},
+        ["--example", "new:2"],
+        "{'example': {'new': '2'}}"
+    )
+    ])
+def test_dict(snakemake_config, annotations, cli_args, expected):
     snk_config = SnkConfig(cli=annotations)
     runner = dynamic_runner(snakemake_config, snk_config)
     res = runner.invoke(["run"] + cli_args)

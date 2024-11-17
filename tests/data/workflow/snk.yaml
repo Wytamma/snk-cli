@@ -15,6 +15,11 @@ cli:
     type: pair 
   enum:
     choices: [a, b, c]
+    default: "a"
+  dict:
+    help: A dictionary
+    type: dict[str, int]
+    default: ["key:1"]
   test:
     another:
       test:
