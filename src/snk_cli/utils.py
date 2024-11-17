@@ -98,6 +98,10 @@ def serialise(d):
     if isinstance(d, Path) or isinstance(d, datetime):
         return str(d)
     
+    # check enum type
+    if hasattr(d, "value"):
+        return d.value
+
     if isinstance(d, tuple):
         return list(d) 
 

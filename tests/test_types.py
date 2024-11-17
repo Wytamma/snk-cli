@@ -140,3 +140,19 @@ def test_pair(snakemake_config, annotations, cli_args, expected):
     res = runner.invoke(["run"] + cli_args)
     assert res.exit_code == 0, res.stderr
     assert expected in res.stdout, res.stderr
+
+@pytest.mark.parametrize("snakemake_config,annotations,cli_args,expected", [
+    # choices
+    (
+        {"example": 1},
+        {"example": {"type": "int", "choices": [1, 2, 3]}},
+        ["--example", 1],
+        "{'example': 1}"
+    ) 
+    ])
+def test_choices(snakemake_config, annotations, cli_args, expected):
+    snk_config = SnkConfig(cli=annotations)
+    runner = dynamic_runner(snakemake_config, snk_config)
+    res = runner.invoke(["run"] + cli_args)
+    assert res.exit_code == 0, res.stderr
+    assert expected in res.stdout, res.stderr

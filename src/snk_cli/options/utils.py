@@ -63,7 +63,10 @@ def create_option_from_annotation(
     updated = False
     if config_default is None or default != config_default:
         updated = True
-    annotation_type = annotation_values.get(f"{annotation_key}:type", get_default_type(default)).lower()
+    annotation_type = annotation_values.get(f"{annotation_key}:type", None) 
+    if annotation_type is not None: 
+        assert annotation_type in types, f"Type '{annotation_type}' not supported."
+    annotation_type = annotation_type or get_default_type(default)
     annotation_type = types.get(
         annotation_type, List[str] if "list" in annotation_type else str
     )
@@ -75,6 +78,9 @@ def create_option_from_annotation(
     default=annotation_values.get(f"{annotation_key}:default", default)
     if default and get_origin(annotation_type) is tuple:
         assert len(default) == 2, f"Default value ({default}) for '{annotation_key}' should be a list of length 2."
+    choices = annotation_values.get(f"{annotation_key}:choices", None)
+    if choices:
+        assert isinstance(choices, list), f"Choices should be a list for '{annotation_key}'."
     return Option(
         name=name,
         original_key=annotation_key,
