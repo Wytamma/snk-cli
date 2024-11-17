@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, get_origin
 from .config import SnkConfig
 from .options.utils import types
 import inspect
@@ -56,11 +56,16 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
             if val_type is None:
                 raise ValueError(f"Unknown type '{val_info['type']}'")
             try:
-                if getattr(val_type, "__origin__", None) == list:
+                if getattr(val_type, "__origin__", None) is list:
                     val_type = val_type.__args__[0]
                     if not isinstance(value, list):
                         raise ValueError(f"Expected a list for key '{key}'")
                     config[key] = [val_type(v) for v in value]
+                elif get_origin(val_type) is tuple:
+                    assert len(value) == 2, f"Expected a list of length 2 for key '{key}'"
+                    key_type = val_type.__args__[0]
+                    val_type = val_type.__args__[1]
+                    config[key] = [key_type(value[0]), val_type(value[1])]
                 else:
                     config[key] = val_type(value)
             except (ValueError, TypeError) as e:

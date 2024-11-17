@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple, get_origin
 from ..config.config import SnkConfig
 from ..utils import get_default_type, flatten
 from .option import Option
@@ -18,8 +18,17 @@ types = {
     "list[str]": List[str],
     "list[path]": List[Path],
     "list[int]": List[int],
-    "enum": Enum,
+    "list[float]": List[float],
+    "pair": Tuple[str, str],
 }
+
+# Define the basic types for the combinations
+basic_types = [int, str, bool, float]
+
+# Add the combinations of the basic types to the `types` dictionary
+for t1 in basic_types:
+    for t2 in basic_types:
+        types[f"pair[{t1.__name__}, {t2.__name__}]"] = Tuple[t1, t2]
 
 def get_keys_from_annotation(annotations):
     # Get the unique keys from the annotations
@@ -50,27 +59,26 @@ def create_option_from_annotation(
       Option: An Option object.
     """
     config_default = default_values.get(annotation_key, None)
-
     default = annotation_values.get(f"{annotation_key}:default", config_default)
     updated = False
     if config_default is None or default != config_default:
         updated = True
-    type = annotation_values.get(f"{annotation_key}:type", get_default_type(default))
-    assert (
-        type is not None
-    ), f"Type for {annotation_key} should be one of {', '.join(types.keys())}."
+    annotation_type = annotation_values.get(f"{annotation_key}:type", get_default_type(default)).lower()
     annotation_type = types.get(
-        type.lower(), List[str] if "list" in type.lower() else str
+        annotation_type, List[str] if "list" in annotation_type else str
     )
     name = annotation_values.get(
         f"{annotation_key}:name", annotation_key.replace(":", "_")
     ).replace("-", "_")
     short = annotation_values.get(f"{annotation_key}:short", None)
     hidden = annotation_values.get(f"{annotation_key}:hidden", False)
+    default=annotation_values.get(f"{annotation_key}:default", default)
+    if default and get_origin(annotation_type) is tuple:
+        assert len(default) == 2, f"Default value ({default}) for '{annotation_key}' should be a list of length 2."
     return Option(
         name=name,
         original_key=annotation_key,
-        default=annotation_values.get(f"{annotation_key}:default", default),
+        default=default,
         updated=updated,
         help=annotation_values.get(f"{annotation_key}:help", ""),
         type=annotation_type,

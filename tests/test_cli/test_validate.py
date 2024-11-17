@@ -73,6 +73,18 @@ import pytest
         {"example": {"type": "list[path]"}},
         {"example": [Path("1"), Path("2")]}
     ),
+    # pair type
+    (
+        {"example": ["1", "2"]},
+        {"example": {"type": "pair[int, int]"}},
+        {"example": [1, 2]}   
+    ),
+    # choices
+    (
+        {"example": "a"},
+        {"example": {"type": "str", "choices": ["a", "b"]}},
+        {"example": "a"}
+    ),
     # nested dictionary
     (
         {"example": {"nested": "1"}},
