@@ -67,7 +67,8 @@ def create_option_from_annotation(
     if config_default is None or default != config_default:
         updated = True
     annotation_type = annotation_values.get(f"{annotation_key}:type", None) 
-    if annotation_type is not None: 
+    if annotation_type is not None:
+        annotation_type = annotation_type.lower()
         assert annotation_type in types, f"Type '{annotation_type}' not supported."
     annotation_type = annotation_type or get_default_type(default)
     annotation_type = types.get(
