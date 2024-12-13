@@ -70,7 +70,7 @@ def create_option_from_annotation(
     if annotation_type is not None:
         annotation_type = annotation_type.lower()
         assert annotation_type in types, f"Type '{annotation_type}' not supported."
-    annotation_type = annotation_type or get_default_type(default)
+    annotation_type = (annotation_type or get_default_type(default)).lower()
     annotation_type = types.get(
         annotation_type, List[str] if "list" in annotation_type else str
     )
