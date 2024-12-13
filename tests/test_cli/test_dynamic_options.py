@@ -38,6 +38,17 @@ def test_create_option_from_annotation(
     assert option.type is str
     assert option.required is True
 
+
+def test_create_option_from_annotation_type_Case_insensitive(
+    default_annotation_values, default_default_values
+):
+    default_annotation_values["test:type"] = "STR"
+    option = create_option_from_annotation(
+        "test", default_annotation_values, default_default_values
+    )
+    assert option.type is str
+
+
 def test_create_option_from_annotation_with_short(
     default_annotation_values, default_default_values
 ):
