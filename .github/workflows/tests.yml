@@ -10,28 +10,10 @@ on:
 
 permissions:
   contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          # Snakemake 7.x (compatible with Python 3.9–3.12)
-          - python-version: "3.8"
-            snakemake-version: "==7.32.4"
-          - python-version: "3.9"
-            snakemake-version: "==7.32.4"
-          - python-version: "3.10"
-            snakemake-version: "==7.32.4"
-          - python-version: "3.11"
-            snakemake-version: "==7.32.4"
-          - python-version: "3.12"
-            snakemake-version: "==7.32.4"
-          # Snakemake 8+ (compatible with Python 3.11–3.12)
-          - python-version: "3.11"
-            snakemake-version: ">8"
-          - python-version: "3.12"
-            snakemake-version: ">8"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,18 +23,22 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
           channels: conda-forge,bioconda,defaults
           channel-priority: strict
 
       - name: Install pip dependencies
         run: |
           pip install hatch
+      
+      - name: Install pip dependencies 
+        run: sudo apt-get update && sudo apt-get install -y llvm
+        run: sudo apt-get -y install graphviz
 
       - name: Run tests
         shell: bash
         run: |
-          hatch run snakemake:cov --matrix python=${{ matrix.python-version }} snakemake=${{ matrix.snakemake-version }}
+          hatch run snakemake:cov
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
