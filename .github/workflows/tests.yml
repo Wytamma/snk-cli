@@ -52,6 +52,7 @@ jobs:
           AR: /usr/bin/ar
         shell: bash
         run: |
+          hatch python install ${{ matrix.python-version }}
           hatch --env "snakemake.py${{ matrix.python-version }}-${{ matrix.snakemake-version }}" run cov
 
       - name: Upload coverage reports to Codecov
