@@ -23,14 +23,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
-          miniforge-variant: Mambaforge
           channels: conda-forge,bioconda,defaults
           channel-priority: strict
-          auto-update-conda: true
 
       - name: Install dependencies
         run: |
