@@ -1,9 +1,8 @@
-from typing import List, Tuple, get_origin
+from typing import Dict, List, Tuple, get_origin
 from ..config.config import SnkConfig
 from ..utils import get_default_type, flatten
 from .option import Option
 from pathlib import Path
-from enum import Enum
 
 types = {
     "int": int,
@@ -21,8 +20,8 @@ types = {
     "list[float]": List[float],
     "pair": Tuple[str, str],
     "dict": dict,
-    "dict[str, str]": dict[str, str],
-    "dict[str, int]": dict[str, int],
+    "dict[str, str]": Dict[str, str],
+    "dict[str, int]": Dict[str, int],
 }
 
 # Define the basic types for the combinations
