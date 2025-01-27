@@ -26,14 +26,15 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
           channels: conda-forge,bioconda,defaults
           channel-priority: strict
 
-      - name: Install dependencies
+      - name: Install conda dependencies
         run: |
-          conda create -n test-env python=${{ matrix.python-version }} pytest coverage
-          conda activate test-env
+          conda install pip pytest coverage
+
+      - name: Install pip dependencies
+        run: | 
           pip install hatch
 
       - name: Install system dependencies
