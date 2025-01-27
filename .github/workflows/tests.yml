@@ -31,9 +31,10 @@ jobs:
         run: |
           pip install hatch
       
-      - name: System dependencies 
+      - name: Install system dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y llvm
+          sudo apt-get update
+          sudo apt-get install -y llvm clang build-essential
           sudo apt-get -y install graphviz
 
       - name: Run tests
