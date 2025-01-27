@@ -45,8 +45,12 @@ path = "src/snk_cli/__about__.py"
 
 
 [[tool.hatch.envs.snakemake.matrix]]
-snakemake = ["==7.32.4", ">8"]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+snakemake = ["==7.32.4"]  # Snakemake 7.x runs on all Python versions
+python = ["3,8", "3.9", "3.10", "3.11", "3.12"]
+
+[[tool.hatch.envs.snakemake.matrix]]
+snakemake = [">8"]  # Snakemake 8+ requires Python 3.11+
+python = ["3.11", "3.12"]
 
 [tool.hatch.envs.default]
 dependencies = [

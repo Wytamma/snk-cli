@@ -15,7 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        include:
+          # Snakemake 7.x (compatible with Python 3.9–3.12)
+          - python-version: "3.8"
+            snakemake-version: "==7.32.4"
+          - python-version: "3.9"
+            snakemake-version: "==7.32.4"
+          - python-version: "3.10"
+            snakemake-version: "==7.32.4"
+          - python-version: "3.11"
+            snakemake-version: "==7.32.4"
+          - python-version: "3.12"
+            snakemake-version: "==7.32.4"
+          # Snakemake 8+ (compatible with Python 3.11–3.12)
+          - python-version: "3.11"
+            snakemake-version: ">8"
+          - python-version: "3.12"
+            snakemake-version: ">8"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,15 +49,10 @@ jobs:
         run: |
           pip install hatch
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y llvm graphviz
-
       - name: Run tests
         shell: bash
         run: |
-          hatch run snakemake:cov --matrix python=${{ matrix.python-version }}
+          hatch run snakemake:cov --matrix python=${{ matrix.python-version }} snakemake=${{ matrix.snakemake-version }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
