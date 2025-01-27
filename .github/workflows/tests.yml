@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11, 3.12]
+        python-version: [3.9, 3.10.x, 3.11, 3.12]
         snakemake-version: [7.32.4, ">8"]
         exclude:
           # Exclude incompatible combinations
