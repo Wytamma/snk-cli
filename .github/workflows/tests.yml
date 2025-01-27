@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8, 3.9, 3.10.16, 3.11, 3.12]
-        snakemake-version: [7.32.4, ">8"]
+        snakemake-version: ["==7.32.4", ">8"]
         exclude:
           # Exclude incompatible combinations
           - python-version: 3.9
@@ -52,7 +52,7 @@ jobs:
           AR: /usr/bin/ar
         shell: bash
         run: |
-          hatch --env "snakemake.py${{ matrix.python-version }}-==${{ matrix.snakemake-version }}" run cov
+          hatch --env "snakemake.py${{ matrix.python-version }}-${{ matrix.snakemake-version }}" run cov
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
