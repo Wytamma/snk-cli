@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10.x, 3.11, 3.12]
+        python-version: [3.9, 3.10.16, 3.11, 3.12]
         snakemake-version: [7.32.4, ">8"]
         exclude:
           # Exclude incompatible combinations
@@ -34,7 +34,6 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
           auto-activate-base: false
           channels: conda-forge,bioconda,defaults
           channel-priority: strict
