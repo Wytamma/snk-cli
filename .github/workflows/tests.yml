@@ -45,7 +45,6 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          conda activate test-env
           hatch run snakemake:cov
 
       - name: Upload coverage reports to Codecov
