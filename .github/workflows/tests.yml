@@ -29,7 +29,7 @@ jobs:
 
       - name: Install pip dependencies
         run: |
-          pip install hatch wheels
+          pip install hatch
       
       - name: Install system dependencies
         run: |
@@ -40,7 +40,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          hatch run snakemake:cov
+          export AR=/usr/bin/ar hatch run snakemake:cov
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
