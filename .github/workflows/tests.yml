@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10.16, 3.11, 3.12]
+        python-version: [3.8, 3.9, 3.10.16, 3.11, 3.12]
         snakemake-version: [7.32.4, ">8"]
         exclude:
           # Exclude incompatible combinations
@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up conda
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-activate-base: false
@@ -45,19 +45,15 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y llvm clang build-essential graphviz
-
-      - name: Set up Hatch environment
-        run: |
-          hatch env create snakemake -M python=${{ matrix.python-version }} snakemake=${{ matrix.snakemake-version }}
-          hatch env select snakemake
+          sudo apt-get install -y llvm clang build-essential graphvi
 
       - name: Run tests
-        shell: bash
         env:
           AR: /usr/bin/ar
+          HATCH_PYTHON: ${{ env.PYTHON_PATH }}
+        shell: bash
         run: |
-          hatch run snakemake:cov
+          hatch --env snakemake.py${{ matrix.python-version }}-==${{ matrix.snakemake-version }} run cov
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3

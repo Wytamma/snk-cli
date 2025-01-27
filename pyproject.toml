@@ -46,7 +46,7 @@ path = "src/snk_cli/__about__.py"
 
 [[tool.hatch.envs.snakemake.matrix]]
 snakemake = ["==7.32.4"]  # Compatible with Python 3.9–3.12
-python = ["3.9", "3.10", "3.11", "3.12"]
+python = ["3.8", "3.9", "3.10.16", "3.11", "3.12"]
 
 [[tool.hatch.envs.snakemake.matrix]]
 snakemake = [">8"]  # Compatible only with Python 3.11 and 3.12
