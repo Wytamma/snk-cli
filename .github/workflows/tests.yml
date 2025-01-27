@@ -29,12 +29,8 @@ jobs:
           channels: conda-forge,bioconda,defaults
           channel-priority: strict
 
-      - name: Install conda dependencies
-        run: |
-          conda install pip pytest coverage
-
       - name: Install pip dependencies
-        run: | 
+        run: |
           pip install hatch
 
       - name: Install system dependencies
@@ -45,7 +41,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          hatch run snakemake:cov
+          hatch run snakemake:cov --matrix python=${{ matrix.python-version }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
