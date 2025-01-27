@@ -45,12 +45,11 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y llvm clang build-essential graphvi
+          sudo apt-get install -y llvm clang build-essential graphviz
 
       - name: Run tests
         env:
           AR: /usr/bin/ar
-          HATCH_PYTHON: ${{ env.PYTHON_PATH }}
         shell: bash
         run: |
           hatch --env snakemake.py${{ matrix.python-version }}-==${{ matrix.snakemake-version }} run cov
