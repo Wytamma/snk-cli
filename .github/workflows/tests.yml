@@ -21,6 +21,8 @@ jobs:
         snakemake-version: ["==7.32.4", ">8"]
         exclude:
           # Exclude incompatible combinations
+          - python-version: 3.8
+            snakemake-version: ">8"
           - python-version: 3.9
             snakemake-version: ">8"
           - python-version: 3.10.16
