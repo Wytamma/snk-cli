@@ -57,16 +57,22 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
                 raise ValueError(f"Unknown type '{val_info['type']}'")
             try:
                 if getattr(val_type, "__origin__", None) is list:
+                    # List
                     val_type = val_type.__args__[0]
                     if not isinstance(value, list):
                         raise ValueError(f"Expected a list for key '{key}'")
                     config[key] = [val_type(v) for v in value]
                 elif get_origin(val_type) is tuple:
+                    # Tuple
                     assert len(value) == 2, f"Expected a list of length 2 for key '{key}'"
                     key_type = val_type.__args__[0]
                     val_type = val_type.__args__[1]
                     config[key] = [key_type(value[0]), val_type(value[1])]
+                elif getattr(val_type, "__origin__", None) is dict:
+                    # Dict
+                    config[key] = val_type(value)
                 else:
+                    # basic
                     config[key] = val_type(value)
             except (ValueError, TypeError) as e:
                 raise ValueError(f"Type conversion error for key '{key}': {e}")
