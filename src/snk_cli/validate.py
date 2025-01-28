@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict, Union, get_origin
 from .config import SnkConfig
-from .options.utils import types
+from .options.utils import allowed_option_types
 import inspect
 
 class ValidationError(Exception):
@@ -52,7 +52,7 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
         val_info = validation[key]
         if isinstance(val_info, dict) and 'type' in val_info:
             # Direct type validation
-            val_type = types.get(val_info["type"].lower(), None)
+            val_type = allowed_option_types.get(val_info["type"].lower(), None)
             if val_type is None:
                 raise ValueError(f"Unknown type '{val_info['type']}'")
             try:
@@ -68,7 +68,7 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
                     key_type = val_type.__args__[0]
                     val_type = val_type.__args__[1]
                     config[key] = [key_type(value[0]), val_type(value[1])]
-                elif getattr(val_type, "__origin__", None) is dict:
+                elif get_origin(val_type) is dict:
                     # Dict
                     config[key] = val_type(value)
                 else:

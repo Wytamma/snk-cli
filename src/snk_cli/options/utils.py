@@ -4,7 +4,7 @@ from ..utils import get_default_type, flatten
 from .option import Option
 from pathlib import Path
 
-types = {
+allowed_option_types = {
     "int": int,
     "integer": int,
     "float": float,
@@ -20,8 +20,8 @@ types = {
     "list[float]": List[float],
     "pair": Tuple[str, str],
     "dict": dict,
-    "dict[str, str]": Dict[str, str],
-    "dict[str, int]": Dict[str, int],
+    "dict[str,str]": Dict[str, str],
+    "dict[str,int]": Dict[str, int],
 }
 
 # Define the basic types for the combinations
@@ -30,7 +30,7 @@ basic_types = [int, str, bool, float]
 # Add the combinations of the basic types to the `types` dictionary
 for t1 in basic_types:
     for t2 in basic_types:
-        types[f"pair[{t1.__name__}, {t2.__name__}]"] = Tuple[t1, t2]
+        allowed_option_types[f"pair[{t1.__name__},{t2.__name__}]"] = Tuple[t1, t2]
 
 def get_keys_from_annotation(annotations):
     # Get the unique keys from the annotations
@@ -68,9 +68,9 @@ def create_option_from_annotation(
     annotation_type = annotation_values.get(f"{annotation_key}:type", None) 
     if annotation_type is not None:
         annotation_type = annotation_type.lower()
-        assert annotation_type in types, f"Type '{annotation_type}' not supported."
+        assert annotation_type in allowed_option_types, f"Type '{annotation_type}' not supported."
     annotation_type = (annotation_type or get_default_type(default)).lower()
-    annotation_type = types.get(
+    annotation_type = allowed_option_types.get(
         annotation_type, List[str] if "list" in annotation_type else str
     )
     name = annotation_values.get(
