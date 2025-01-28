@@ -117,7 +117,7 @@ class SnkConfig:
         invalid_config_keys = set(snk_config_dict.keys()) - fields
         if invalid_config_keys:
             import warnings
-            warnings.warn(f"invalid keys in `snk.yaml` file: {invalid_config_keys}.")
+            warnings.warn(f"""invalid keys '{" ".join(invalid_config_keys)}' in {snk_config_path}.""")
         # filer out any invalid keys
         snk_config_dict = {k: v for k, v in snk_config_dict.items() if k in fields}
         snk_config = cls(**snk_config_dict)
