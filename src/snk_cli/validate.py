@@ -74,16 +74,13 @@ def validate_and_transform_in_place(config: Dict[str, Any], validation: Validati
                         config[key] = value
                         continue
                     assert len(val_type.__args__) == 2, f"Dict type should have 2 arguments for key '{key}'"
-                    dictionary = {}
-                    key_type = val_type.__args__[0]
                     val_type = val_type.__args__[1]
-                    for k, v in value.items():
-                        dictionary[key_type(k)] = val_type(v)
+                    config[key] = {k: val_type(v) for k, v in value.items()}
                 else:
                     # basic
                     config[key] = val_type(value)
             except (ValueError, TypeError) as e:
-                raise ValueError(f"Type conversion error for key '{key}'") from e
+                raise ValueError(f"Type conversion error for key '{key}' ({val_info['type']}). Could not convert value '{value}' to type '{val_type}'.") from e
         elif isinstance(value, dict):
             # Nested dictionary validation
             validate_and_transform_in_place(value, val_info)
