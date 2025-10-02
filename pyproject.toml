@@ -45,12 +45,12 @@ path = "src/snk_cli/__about__.py"
 
 
 [[tool.hatch.envs.snakemake.matrix]]
-snakemake = ["==7.32.4"]  # Compatible with Python 3.9–3.12
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+snakemake = ["==7.32.4"]  # Compatible with Python 3.10–3.13
+python = ["3.10", "3.11", "3.12", "3.13"]
 
 [[tool.hatch.envs.snakemake.matrix]]
-snakemake = [">8"]  # Compatible only with Python 3.11 and 3.12
-python = ["3.11", "3.12"]
+snakemake = [">8,<9", ">9"]  # Compatible only with Python 3.11 and 3.13
+python = ["3.11", "3.12", "3.13"]
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -69,6 +69,7 @@ cov = [
   "test-cov",
   "cov-report",
 ]
+list-deps = "pip list"
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
