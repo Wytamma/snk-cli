@@ -17,7 +17,7 @@ class SnkCliRunner:
     """
 
     cli: CLI
-    runner = CliRunner(mix_stderr=False)
+    runner = CliRunner()
 
     def invoke(self, args: List[str]) -> Result:
         old_argv = sys.argv
