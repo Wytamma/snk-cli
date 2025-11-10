@@ -1,10 +1,7 @@
-from typing import Tuple
 import pytest
 from pathlib import Path
 from .utils import SnkCliRunner
-from snk_cli.config import SnkConfig
 from snk_cli import CLI
-import yaml
 
 @pytest.fixture()
 def example_config():
