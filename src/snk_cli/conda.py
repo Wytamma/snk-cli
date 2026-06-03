@@ -1,43 +1,73 @@
 # This file contains functions to create and manage conda environments for snakemake workflows
-# it needs to work with v 7 and 8 of snakemake
-# 
+# it needs to work with v7, v8, and v9 of snakemake
 from pathlib import Path
 from packaging import version
-from dataclasses import dataclass
+from types import SimpleNamespace
+import inspect
 import os
 
 from snk_cli.utils import check_command_available
 from snakemake.deployment.conda import Env
-from snakemake.persistence import Persistence
 import snakemake
 
-snakemake_version = version.parse(snakemake.__version__)
+try:
+    snakemake_version_text = snakemake.__version__
+except AttributeError:
+    from snakemake.common import __version__ as snakemake_version_text
+
+snakemake_version = version.parse(snakemake_version_text)
 is_snakemake_version_8_or_above = snakemake_version >= version.parse('8')
 
-@dataclass
-class PersistenceMock(Persistence):
+
+def create_persistence_paths(conda_prefix):
     """
-    Mock for workflow.persistence
+    Minimal workflow.persistence replacement for Env path calculation.
     """
-    conda_env_path: Path = None
-    _metadata_path: Path = None
-    _incomplete_path: Path = None
-    shadow_path: Path = None
-    conda_env_archive_path: Path = None
-    container_img_path: Path = None
-    aux_path: Path = None
+    return SimpleNamespace(
+        conda_env_path=Path(conda_prefix).resolve() if conda_prefix else None,
+        _metadata_path=None,
+        _incomplete_path=None,
+        shadow_path=None,
+        conda_env_archive_path=os.path.join(Path(".snakemake"), "conda-archive"),
+        container_img_path=None,
+        aux_path=None,
+    )
+
+
+def _create_workflow_namespace(conda_prefix):
+    """
+    Full duck-typed workflow mock for v9+, where Workflow.__init__ requires
+    logger_manager — too complex to construct just for conda env management.
+    Provides only the attributes that snakemake.deployment.conda.Env accesses.
+    """
+    persistence = create_persistence_paths(conda_prefix)
+    return SimpleNamespace(
+        persistence=persistence,
+        deployment_settings=SimpleNamespace(apptainer_args=""),
+        runtime_paths=[persistence.conda_env_path] if persistence.conda_env_path else [],
+        sourcecache=SimpleNamespace(
+            exists=lambda *a, **kw: False,
+            open=lambda *a, **kw: None,
+        ),
+    )
+
+
+def set_workflow_persistence(workflow, persistence):
+    if hasattr(workflow, "_persistence"):
+        workflow._persistence = persistence
+    else:
+        workflow.persistence = persistence
 
 
 def get_frontend():
     if check_command_available("mamba"):
-        conda_frontend = "mamba"
-    else:
-        conda_frontend = "conda"
-    return conda_frontend
+        return "mamba"
+    return "conda"
+
 
 def create_workflow_v7(conda_prefix):
     from snakemake.workflow import Workflow
-    
+
     conda_frontend = get_frontend()
     workflow = Workflow(
         snakefile=Path(),
@@ -48,20 +78,11 @@ def create_workflow_v7(conda_prefix):
         conda_frontend=conda_frontend,
         use_conda=True,
     )
-
-    persistence = PersistenceMock(
-        conda_env_path=Path(conda_prefix).resolve() if conda_prefix else None,
-        conda_env_archive_path=os.path.join(Path(".snakemake"), "conda-archive"),
-    )
-    if hasattr(workflow, "_persistence"):
-        workflow._persistence = persistence
-    else:
-        workflow.persistence = persistence
+    set_workflow_persistence(workflow, create_persistence_paths(conda_prefix))
     return workflow
 
-def create_workflow_v8(
-        conda_prefix
-    ):
+
+def create_workflow_v8(conda_prefix):
     from snakemake.api import (
         Workflow,
         ConfigSettings,
@@ -70,6 +91,11 @@ def create_workflow_v8(
         WorkflowSettings,
         StorageSettings,
     )
+
+    # v9+ added logger_manager as a required param; simpler to mock the whole workflow
+    if "logger_manager" in inspect.signature(Workflow).parameters:
+        return _create_workflow_namespace(conda_prefix)
+
     conda_frontend = get_frontend()
     workflow = Workflow(
         config_settings=ConfigSettings(),
@@ -77,30 +103,22 @@ def create_workflow_v8(
         workflow_settings=WorkflowSettings(),
         storage_settings=StorageSettings(),
         deployment_settings=DeploymentSettings(
-            conda_frontend=conda_frontend, 
-            conda_prefix=conda_prefix
+            conda_frontend=conda_frontend,
+            conda_prefix=conda_prefix,
         ),
     )
-    persistence = PersistenceMock(
-        conda_env_path=Path(conda_prefix).resolve() if conda_prefix else None,
-        conda_env_archive_path=os.path.join(Path(".snakemake"), "conda-archive"),
-    )
-    if hasattr(workflow, "_persistence"):
-        workflow._persistence = persistence
-    else:
-        workflow.persistence = persistence
+    set_workflow_persistence(workflow, create_persistence_paths(conda_prefix))
     return workflow
+
 
 def conda_environment_factory(env_file_path: Path, conda_prefix_dir_path: Path) -> Env:
     """
-    Create a snakemake environment object from a given environment file and conda prefix directory
+    Create a snakemake environment object from a given environment file and conda prefix directory.
     """
     if is_snakemake_version_8_or_above:
-        snakemake_workflow = create_workflow_v8(
-            conda_prefix_dir_path
-        )
+        snakemake_workflow = create_workflow_v8(conda_prefix_dir_path)
     else:
         snakemake_workflow = create_workflow_v7(conda_prefix_dir_path)
     env_file_path = Path(env_file_path).resolve()
-    env = Env(snakemake_workflow, env_file=env_file_path)
-    return env
+    return Env(snakemake_workflow, env_file=env_file_path)
+
