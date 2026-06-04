@@ -17,6 +17,7 @@ except AttributeError:
 
 snakemake_version = version.parse(snakemake_version_text)
 is_snakemake_version_8_or_above = snakemake_version >= version.parse('8')
+is_snakemake_version_9_or_above = snakemake_version >= version.parse('9')
 
 
 def create_persistence_paths(conda_prefix):
@@ -121,4 +122,3 @@ def conda_environment_factory(env_file_path: Path, conda_prefix_dir_path: Path) 
         snakemake_workflow = create_workflow_v7(conda_prefix_dir_path)
     env_file_path = Path(env_file_path).resolve()
     return Env(snakemake_workflow, env_file=env_file_path)
-
