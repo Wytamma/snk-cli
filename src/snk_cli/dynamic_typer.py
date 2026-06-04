@@ -1,6 +1,5 @@
 import typer
-from click import Tuple
-from typing import List, Callable, get_origin
+from typing import List, Callable, get_args, get_origin
 from inspect import signature, Parameter
 from makefun import with_signature
 from enum import Enum
@@ -159,10 +158,7 @@ class DynamicTyper:
             annotation_type = Enum(f'{option.name}', {str(e): annotation_type(e) for e in option.choices})
         click_type = None
         if get_origin(annotation_type) is dict or annotation_type is dict:
-            click_type = Tuple([str, str])
-            if hasattr(annotation_type, '__args__') and len(annotation_type.__args__) == 2:
-                click_type = Tuple([str, annotation_type.__args__[1]])
-            annotation_type = List[Tuple]
+            annotation_type, click_type = self._get_dict_cli_types(annotation_type)
             if type(default) is dict:
                 default = [[k, v] for k, v in default.items()]
         return Parameter(
@@ -178,6 +174,20 @@ class DynamicTyper:
             ),
             annotation=annotation_type,
         )
+
+    @staticmethod
+    def _get_dict_cli_types(dict_type):
+        """
+        Return the annotation and parser type for a repeatable key-value option.
+
+        Typer uses the outer List to make an option repeatable, but does not
+        support parameterized tuples inside a List. The unparameterized tuple
+        accurately describes each parsed value, while click_type supplies the
+        concrete key and value parsers.
+        """
+        type_args = get_args(dict_type)
+        value_type = type_args[1] if len(type_args) == 2 else str
+        return List[tuple], (str, value_type)
 
     def check_if_option_passed_via_command_line(self, option: Option):
         """

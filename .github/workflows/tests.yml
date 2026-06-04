@@ -17,15 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", 3.11, 3.12, 3.13]
-        snakemake-version: ["==7.32.4", ">8,<9", ">9"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        snakemake-version: ["==7.32.4", ">8,<9", ">=9,<10"]
         exclude:
           # Exclude incompatible combinations
           - python-version: "3.10"
             snakemake-version: ">8,<9"
           - python-version: "3.10"
-            snakemake-version: ">9"
-          
+            snakemake-version: ">=9,<10"
+        include:
+          - python-version: "3.14"
+            snakemake-version: ">=9.22,<10"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
