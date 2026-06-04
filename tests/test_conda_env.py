@@ -9,3 +9,9 @@ def test_conda_env(tmp_path):
     assert not Path(env.address).exists()
     env.create()
     assert Path(env.address).exists()
+
+
+def test_conda_env_content(tmp_path):
+    env_file = Path("tests/data/workflow/workflow/envs/wget.yml").resolve()
+    env = conda_environment_factory(env_file, tmp_path)
+    assert env.content == env_file.read_bytes()
