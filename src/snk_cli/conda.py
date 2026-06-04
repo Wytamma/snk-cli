@@ -28,9 +28,14 @@ class PersistenceMock:
     container_img_path: Path = None
     aux_path: Path = None
 
+    def __post_init__(self):
+        for path in (self.conda_env_path, self.conda_env_archive_path):
+            if path:
+                Path(path).mkdir(parents=True, exist_ok=True)
+
 
 def get_frontend():
-    if check_command_available("mamba"):
+    if check_command_available("mamba") and not is_snakemake_version_9_or_above:
         conda_frontend = "mamba"
     else:
         conda_frontend = "conda"

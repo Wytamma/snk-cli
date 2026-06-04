@@ -15,3 +15,10 @@ def test_conda_env_content(tmp_path):
     env_file = Path("tests/data/workflow/workflow/envs/wget.yml").resolve()
     env = conda_environment_factory(env_file, tmp_path)
     assert env.content == env_file.read_bytes()
+
+
+def test_conda_env_factory_creates_prefix(tmp_path):
+    env_file = Path("tests/data/workflow/workflow/envs/wget.yml").resolve()
+    conda_prefix = tmp_path / "conda"
+    conda_environment_factory(env_file, conda_prefix)
+    assert conda_prefix.exists()
