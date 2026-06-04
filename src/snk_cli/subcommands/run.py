@@ -395,16 +395,15 @@ class RunApp(DynamicTyper):
                     )
             yield
         finally:
-            if not cleanup:
-                return
-            for copied_resource in copied_resources:
-                if copied_resource.exists():
-                    if self.verbose:
-                        self.log(
-                            f"Deleting '{copied_resource.name}' resource...",
-                            color=typer.colors.MAGENTA,
-                        )
-                    remove_resource(copied_resource)
+            if cleanup:
+                for copied_resource in copied_resources:
+                    if copied_resource.exists():
+                        if self.verbose:
+                            self.log(
+                                f"Deleting '{copied_resource.name}' resource...",
+                                color=typer.colors.MAGENTA,
+                            )
+                        remove_resource(copied_resource)
 
 def execute_snakemake(args):
     """
