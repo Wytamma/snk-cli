@@ -4,6 +4,7 @@ from snk_cli.dynamic_typer import DynamicTyper
 from snk_cli.options import Option
 from inspect import signature, Parameter
 import typer
+from typing import Dict, List
 
 class SubApp(DynamicTyper):
     def __init__(self):
@@ -92,6 +93,27 @@ def test_create_cli_parameter(dynamic_typer):
     assert param.annotation == int
     assert isinstance(param.default, typer.models.OptionInfo)
     assert param.kind == Parameter.POSITIONAL_OR_KEYWORD
+
+
+def test_create_dict_cli_parameter(dynamic_typer):
+    option = Option(
+        name="labels",
+        type=Dict[str, int],
+        required=False,
+        default={"first": 1},
+        help="Labels",
+        short=None,
+        updated=False,
+        original_key="labels",
+        flag="--labels",
+        short_flag=None,
+    )
+
+    param = dynamic_typer._create_cli_parameter(option)
+
+    assert param.annotation == List[tuple]
+    assert param.default.click_type == (str, int)
+    assert param.default.default == [["first", 1]]
 
 
 

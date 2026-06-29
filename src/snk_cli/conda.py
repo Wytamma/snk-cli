@@ -1,21 +1,22 @@
 # This file contains functions to create and manage conda environments for snakemake workflows
-# it needs to work with v 7 and 8 of snakemake
+# it needs to work with v 7, 8 and 9 of snakemake
 # 
 from pathlib import Path
 from packaging import version
 from dataclasses import dataclass
+import inspect
 import os
 
 from snk_cli.utils import check_command_available
 from snakemake.deployment.conda import Env
-from snakemake.persistence import Persistence
 import snakemake
 
 snakemake_version = version.parse(snakemake.__version__)
 is_snakemake_version_8_or_above = snakemake_version >= version.parse('8')
+is_snakemake_version_9_or_above = snakemake_version >= version.parse('9')
 
 @dataclass
-class PersistenceMock(Persistence):
+class PersistenceMock:
     """
     Mock for workflow.persistence
     """
@@ -27,9 +28,14 @@ class PersistenceMock(Persistence):
     container_img_path: Path = None
     aux_path: Path = None
 
+    def __post_init__(self):
+        for path in (self.conda_env_path, self.conda_env_archive_path):
+            if path:
+                Path(path).mkdir(parents=True, exist_ok=True)
+
 
 def get_frontend():
-    if check_command_available("mamba"):
+    if check_command_available("mamba") and not is_snakemake_version_9_or_above:
         conda_frontend = "mamba"
     else:
         conda_frontend = "conda"
@@ -70,6 +76,7 @@ def create_workflow_v8(
         WorkflowSettings,
         StorageSettings,
     )
+    workflow_kwargs = {"logger_manager": None} if "logger_manager" in inspect.signature(Workflow).parameters else {}
     conda_frontend = get_frontend()
     workflow = Workflow(
         config_settings=ConfigSettings(),
@@ -80,6 +87,7 @@ def create_workflow_v8(
             conda_frontend=conda_frontend, 
             conda_prefix=conda_prefix
         ),
+        **workflow_kwargs,
     )
     persistence = PersistenceMock(
         conda_env_path=Path(conda_prefix).resolve() if conda_prefix else None,

@@ -12,6 +12,10 @@ from ..workflow import Workflow
 from rich.console import Console
 from rich.syntax import Syntax
 from snakemake.deployment.conda import Conda, CreateCondaEnvironmentException
+try:
+    from snakemake_interface_common.exceptions import WorkflowError
+except ImportError:
+    from snakemake.exceptions import WorkflowError
 
 from concurrent.futures import ProcessPoolExecutor
 
@@ -30,7 +34,7 @@ def create_conda_environment_wrapper(args):
     env_path = Path(env_path_str).resolve()
     try:
         conda_environment_factory(env_path, conda_prefix_dir).create()
-    except CreateCondaEnvironmentException as e:
+    except (CreateCondaEnvironmentException, WorkflowError) as e:
         typer.secho(str(e), fg="red", err=True)
         return 1
     return 0
@@ -160,8 +164,13 @@ class EnvApp(DynamicTyper):
             )
             for path in env_paths 
         ]
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            status_codes = executor.map(create_conda_environment_wrapper, env_args)
+        if max_workers == 1:
+            status_codes = [
+                create_conda_environment_wrapper(args) for args in env_args
+            ]
+        else:
+            with ProcessPoolExecutor(max_workers=max_workers) as executor:
+                status_codes = list(executor.map(create_conda_environment_wrapper, env_args))
         if any(status_codes):
             self.error("Failed to create all conda environments!")
         if names:

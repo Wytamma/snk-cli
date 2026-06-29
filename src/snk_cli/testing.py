@@ -20,6 +20,7 @@ class SnkCliRunner:
     runner = CliRunner()
 
     def invoke(self, args: List[str]) -> Result:
+        args = [str(arg) for arg in args]
         old_argv = sys.argv
         sys.argv = ['cli'] + args  # ensure that the CLI is invoked with the correct arguments
         result = self.runner.invoke(self.cli.app, args)

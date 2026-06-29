@@ -5,7 +5,10 @@ from contextlib import contextmanager
 
 from snk_cli.dynamic_typer import DynamicTyper
 from snk_cli.options.option import Option
-from snk_cli.conda import is_snakemake_version_8_or_above
+from snk_cli.conda import (
+    is_snakemake_version_8_or_above,
+    is_snakemake_version_9_or_above,
+)
 from ..workflow import Workflow
 from snk_cli.utils import (
     parse_config_args,
@@ -219,21 +222,24 @@ class RunApp(DynamicTyper):
             )
 
         if conda_found and self.snk_config.conda and not no_conda:
-            args.extend(
-                [
-                    "--use-conda",
-                    f"--conda-prefix={self.conda_prefix_dir}",
-                ]
-            )
-            if not check_command_available("mamba"):
-                if verbose:
-                    self.log(
-                        "Could not find mamba, using conda instead...",
-                        color=typer.colors.MAGENTA,
-                    )
-                args.append("--conda-frontend=conda")
+            if is_snakemake_version_9_or_above: # support for mamba deprecated since v8.20.6(#3121)
+                args.extend(["--software-deployment-method", "conda"])
             else:
-                args.append("--conda-frontend=mamba")
+                args.extend(
+                    [
+                        "--use-conda",
+                        f"--conda-prefix={self.conda_prefix_dir}",
+                    ]
+                )
+                if not check_command_available("mamba"):
+                    if verbose:
+                        self.log(
+                            "Could not find mamba, using conda instead...",
+                            color=typer.colors.MAGENTA,
+                        )
+                    args.append("--conda-frontend=conda")
+                else:
+                    args.append("--conda-frontend=mamba")
 
         if verbose:
             args.insert(0, "--verbose")
@@ -395,16 +401,15 @@ class RunApp(DynamicTyper):
                     )
             yield
         finally:
-            if not cleanup:
-                return
-            for copied_resource in copied_resources:
-                if copied_resource.exists():
-                    if self.verbose:
-                        self.log(
-                            f"Deleting '{copied_resource.name}' resource...",
-                            color=typer.colors.MAGENTA,
-                        )
-                    remove_resource(copied_resource)
+            if cleanup:
+                for copied_resource in copied_resources:
+                    if copied_resource.exists():
+                        if self.verbose:
+                            self.log(
+                                f"Deleting '{copied_resource.name}' resource...",
+                                color=typer.colors.MAGENTA,
+                            )
+                        remove_resource(copied_resource)
 
 def execute_snakemake(args):
     """
