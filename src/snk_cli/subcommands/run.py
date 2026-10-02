@@ -13,7 +13,7 @@ from ..workflow import Workflow
 from snk_cli.utils import (
     parse_config_args,
     dag_filetype_callback,
-    check_command_available
+    check_command_available,
 )
 
 from snk_cli.config.config import (
@@ -178,7 +178,7 @@ class RunApp(DynamicTyper):
             if verbose:
                 self.log(
                     f"Using additional snakemake args: {' '.join(self.snk_config.additional_snakemake_args)}",
-                    color=typer.colors.MAGENTA
+                    color=typer.colors.MAGENTA,
                 )
             args.extend(self.snk_config.additional_snakemake_args)
         if not cores:
@@ -193,7 +193,10 @@ class RunApp(DynamicTyper):
             # only set prefix if --use-singularity is explicitly called
             args.append(f"--singularity-prefix={self.singularity_prefix_dir}")
             if verbose:
-                self.log(f"Using singularity prefix: {self.singularity_prefix_dir}", color=typer.colors.MAGENTA)
+                self.log(
+                    f"Using singularity prefix: {self.singularity_prefix_dir}",
+                    color=typer.colors.MAGENTA,
+                )
         if not self.snakefile.exists():
             raise ValueError("Could not find Snakefile")  # this should occur at install
         else:
@@ -222,24 +225,18 @@ class RunApp(DynamicTyper):
             )
 
         if conda_found and self.snk_config.conda and not no_conda:
-            if is_snakemake_version_9_or_above: # support for mamba deprecated since v8.20.6(#3121)
+            if (
+                is_snakemake_version_9_or_above
+            ):  # support for mamba deprecated since v8.20.6(#3121)
                 args.extend(["--software-deployment-method", "conda"])
             else:
                 args.extend(
                     [
                         "--use-conda",
                         f"--conda-prefix={self.conda_prefix_dir}",
+                        "--conda-frontend=conda",
                     ]
                 )
-                if not check_command_available("mamba"):
-                    if verbose:
-                        self.log(
-                            "Could not find mamba, using conda instead...",
-                            color=typer.colors.MAGENTA,
-                        )
-                    args.append("--conda-frontend=conda")
-                else:
-                    args.append("--conda-frontend=mamba")
 
         if verbose:
             args.insert(0, "--verbose")
@@ -384,7 +381,7 @@ class RunApp(DynamicTyper):
         if self.verbose and resources:
             self.log(
                 f"Copying {len(resources)} resources to working directory...",
-                color=typer.colors.MAGENTA
+                color=typer.colors.MAGENTA,
             )
         try:
             for resource in resources:
@@ -411,6 +408,7 @@ class RunApp(DynamicTyper):
                             )
                         remove_resource(copied_resource)
 
+
 def execute_snakemake(args):
     """
     Execute snakemake with the given arguments.
@@ -422,13 +420,16 @@ def execute_snakemake(args):
       Executes snakemake with the given arguments.
     """
     import snakemake
+
     if is_snakemake_version_8_or_above:
         from snakemake import cli
+
         cli.parse_config = parse_config_monkeypatch
         cli.main(args)
     else:
         snakemake.parse_config = parse_config_monkeypatch
         snakemake.main(args)
+
 
 def parse_config_monkeypatch(args):
     """
@@ -442,11 +443,14 @@ def parse_config_monkeypatch(args):
     """
     import yaml
     import re
+
     if is_snakemake_version_8_or_above:
         from snakemake.cli import parse_key_value_arg, update_config, _bool_parser
+
         entries = args
     else:
         from snakemake import parse_key_value_arg, update_config, _bool_parser
+
         entries = args.config
 
     class NoDatesSafeLoader(yaml.SafeLoader):
