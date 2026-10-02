@@ -1,6 +1,6 @@
 # This file contains functions to create and manage conda environments for snakemake workflows
 # it needs to work with v 7, 8 and 9 of snakemake
-# 
+#
 from pathlib import Path
 from packaging import version
 from dataclasses import dataclass
@@ -12,14 +12,16 @@ from snakemake.deployment.conda import Env
 import snakemake
 
 snakemake_version = version.parse(snakemake.__version__)
-is_snakemake_version_8_or_above = snakemake_version >= version.parse('8')
-is_snakemake_version_9_or_above = snakemake_version >= version.parse('9')
+is_snakemake_version_8_or_above = snakemake_version >= version.parse("8")
+is_snakemake_version_9_or_above = snakemake_version >= version.parse("9")
+
 
 @dataclass
 class PersistenceMock:
     """
     Mock for workflow.persistence
     """
+
     conda_env_path: Path = None
     _metadata_path: Path = None
     _incomplete_path: Path = None
@@ -35,15 +37,14 @@ class PersistenceMock:
 
 
 def get_frontend():
-    if check_command_available("mamba") and not is_snakemake_version_9_or_above:
-        conda_frontend = "mamba"
-    else:
-        conda_frontend = "conda"
+    # default to conda
+    conda_frontend = "conda"
     return conda_frontend
+
 
 def create_workflow_v7(conda_prefix):
     from snakemake.workflow import Workflow
-    
+
     conda_frontend = get_frontend()
     workflow = Workflow(
         snakefile=Path(),
@@ -65,9 +66,8 @@ def create_workflow_v7(conda_prefix):
         workflow.persistence = persistence
     return workflow
 
-def create_workflow_v8(
-        conda_prefix
-    ):
+
+def create_workflow_v8(conda_prefix):
     from snakemake.api import (
         Workflow,
         ConfigSettings,
@@ -76,7 +76,12 @@ def create_workflow_v8(
         WorkflowSettings,
         StorageSettings,
     )
-    workflow_kwargs = {"logger_manager": None} if "logger_manager" in inspect.signature(Workflow).parameters else {}
+
+    workflow_kwargs = (
+        {"logger_manager": None}
+        if "logger_manager" in inspect.signature(Workflow).parameters
+        else {}
+    )
     conda_frontend = get_frontend()
     workflow = Workflow(
         config_settings=ConfigSettings(),
@@ -84,8 +89,7 @@ def create_workflow_v8(
         workflow_settings=WorkflowSettings(),
         storage_settings=StorageSettings(),
         deployment_settings=DeploymentSettings(
-            conda_frontend=conda_frontend, 
-            conda_prefix=conda_prefix
+            conda_frontend=conda_frontend, conda_prefix=conda_prefix
         ),
         **workflow_kwargs,
     )
@@ -99,14 +103,13 @@ def create_workflow_v8(
         workflow.persistence = persistence
     return workflow
 
+
 def conda_environment_factory(env_file_path: Path, conda_prefix_dir_path: Path) -> Env:
     """
     Create a snakemake environment object from a given environment file and conda prefix directory
     """
     if is_snakemake_version_8_or_above:
-        snakemake_workflow = create_workflow_v8(
-            conda_prefix_dir_path
-        )
+        snakemake_workflow = create_workflow_v8(conda_prefix_dir_path)
     else:
         snakemake_workflow = create_workflow_v7(conda_prefix_dir_path)
     env_file_path = Path(env_file_path).resolve()
